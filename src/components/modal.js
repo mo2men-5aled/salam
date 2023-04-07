@@ -253,6 +253,7 @@ function PopUpForm(props) {
                         { merge: true }
                       );
                     } else {
+                      handleClose();
                       Shared_Connection.add({ ...form_Values });
                     }
                   }
