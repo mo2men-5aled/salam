@@ -14,7 +14,6 @@ function property(object, prop) {
 }
 
 const Create_Vcard = async (data, username, user_img) => {
-  
   const myVCard = new VCard();
 
   const image = await axios.get(user_img, { responseType: "arraybuffer" });
@@ -68,7 +67,6 @@ const Create_Vcard = async (data, username, user_img) => {
   const zillow = property(data, "Zillow").value; //
   const hoobe = property(data, "hoobe").value; //
 
-  console.log(last_name, first_name);
   myVCard
     .addName(last_name, first_name)
     .addAddress(address)

@@ -4,7 +4,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Image from "react-bootstrap/Image";
 import LoginModal from "../modals/LoginModal";
 
-import logo from "../assets/dark.png";
+import logo from "../assets/white_logo.png";
 
 function NavBarOffCanvas() {
   return (

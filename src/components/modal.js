@@ -107,169 +107,170 @@ function PopUpForm(props) {
       </button>
 
       {/* Model form pops up */}
-      <div className="d-flex align-items-center">
-        <Modal
-          show={show}
-          onHide={handleClose}
-          style={{ padding: "60px 30px 30px 30px", borderRadius: "100px" }}
-        >
-          <div className="img_div">
-            <UserImage
-              User={props.image}
-              classname="form_image"
-              profile="false"
+
+      <Modal
+        show={show}
+        onHide={handleClose}
+        size="md"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <div className="img_div">
+          <UserImage
+            User={props.image}
+            classname="form_image"
+            profile="false"
+          />
+        </div>
+
+        <div className="close_btn">
+          <button
+            type="button"
+            className="btn-close"
+            aria-label="Close"
+            onClick={handleClose}
+          ></button>
+        </div>
+
+        <h4 className="text-center">
+          {props.language === "ar"
+            ? " شارك معلوماتك مع "
+            : "Share your info back with"}
+          <p>
+            {props.language === "ar" ? (
+              <>{props.username.name}</>
+            ) : (
+              <>{props.username.name}</>
+            )}
+          </p>
+        </h4>
+
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              type="email"
+              placeholder={
+                props.language === "ar" ? "البريد الالكتروني" : "Email"
+              }
+              name="email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (Users_Emails.includes(e.target.value)) {
+                  setEmailFound(true);
+                } else {
+                  setEmailFound(false);
+                }
+              }}
+              required
             />
-          </div>
 
-          <div className="close_btn">
-            <button
-              type="button"
-              className="btn-close"
-              aria-label="Close"
-              onClick={handleClose}
-            ></button>
-          </div>
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              type="text"
+              placeholder={props.language === "ar" ? "الاسم" : "Name"}
+              name="name"
+              onChange={(e) => {
+                setName(e.target.value);
 
-          <h4 className="text-center">
-            {props.language === "ar"
-              ? " شارك معلوماتك مع "
-              : "Share your info back with"}
-            <p>
-              {props.language === "ar" ? (
-                <>{props.username.name}</>
-              ) : (
-                <>{props.username.name}</>
-              )}
-            </p>
-          </h4>
-
-          <Modal.Body>
-            <Form onSubmit={handleSubmit}>
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                type="email"
-                placeholder={
-                  props.language === "ar" ? "البريد الالكتروني" : "Email"
+                if (emailFound) {
+                  get_user_id_by_mail();
                 }
-                name="email"
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (Users_Emails.includes(e.target.value)) {
-                    setEmailFound(true);
+              }}
+              required
+            />
+
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              type="number"
+              placeholder={
+                props.language === "ar" ? "رقم الهاتف" : "Phone Number"
+              }
+              name="number"
+              onChange={(e) => {
+                setPhone(e.target.value);
+
+                if (emailFound) {
+                  get_user_id_by_mail();
+                }
+              }}
+              required
+            />
+
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              type="text"
+              name="job title"
+              placeholder={
+                props.language === "ar" ? "المسمى الوظيفي" : "Job Title"
+              }
+              onChange={(e) => {
+                setJob(e.target.value);
+
+                if (emailFound) {
+                  get_user_id_by_mail();
+                }
+              }}
+            />
+
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              type="text"
+              name="company"
+              placeholder={props.language === "ar" ? "الشركة" : "Company"}
+              onChange={(e) => {
+                setCompany(e.target.value);
+              }}
+            />
+
+            <Form.Control
+              dir={props.language === "ar" ? "rtl" : "ltr"}
+              as="textarea"
+              placeholder={props.language === "ar" ? "ملاحظات" : "Notes"}
+              onChange={(e) => {
+                setNotes(e.target.value);
+              }}
+            />
+
+            <Button
+              className="connect_button"
+              type="submit"
+              style={{
+                width: "100%",
+                borderRadius: "30px",
+                height: "50px",
+                backgroundColor: `${
+                  Get_Color(props.color, Colors, property).value.background
+                }`,
+                color: "white",
+                fontWeight: "bold",
+              }}
+              onClick={() => {
+                if (email && name && phone) {
+                  if (emailFound) {
+                    handleClose();
+                    Shared_Connection.doc(user_id).set({ ...form_Values });
+                    User_Connections.doc(params.id).set(
+                      { time: date },
+                      { merge: true }
+                    );
                   } else {
-                    setEmailFound(false);
+                    handleClose();
+                    Shared_Connection.add({ ...form_Values });
                   }
-                }}
-                required
-              />
-
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                type="text"
-                placeholder={props.language === "ar" ? "الاسم" : "Name"}
-                name="name"
-                onChange={(e) => {
-                  setName(e.target.value);
-
-                  if (emailFound) {
-                    get_user_id_by_mail();
-                  }
-                }}
-                required
-              />
-
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                type="number"
-                placeholder={
-                  props.language === "ar" ? "رقم الهاتف" : "Phone Number"
                 }
-                name="number"
-                onChange={(e) => {
-                  setPhone(e.target.value);
-
-                  if (emailFound) {
-                    get_user_id_by_mail();
-                  }
-                }}
-                required
-              />
-
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                type="text"
-                name="job title"
-                placeholder={
-                  props.language === "ar" ? "المسمى الوظيفي" : "Job Title"
-                }
-                onChange={(e) => {
-                  setJob(e.target.value);
-
-                  if (emailFound) {
-                    get_user_id_by_mail();
-                  }
-                }}
-              />
-
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                type="text"
-                name="company"
-                placeholder={props.language === "ar" ? "الشركة" : "Company"}
-                onChange={(e) => {
-                  setCompany(e.target.value);
-                }}
-              />
-
-              <Form.Control
-                dir={props.language === "ar" ? "rtl" : "ltr"}
-                as="textarea"
-                placeholder={props.language === "ar" ? "ملاحظات" : "Notes"}
-                onChange={(e) => {
-                  setNotes(e.target.value);
-                }}
-              />
-
-              <Button
-                className="connect_button"
-                type="submit"
-                style={{
-                  width: "100%",
-                  borderRadius: "30px",
-                  height: "50px",
-                  backgroundColor: `${
-                    Get_Color(props.color, Colors, property).value.background
-                  }`,
-                  color: "white",
-                  fontWeight: "bold",
-                }}
-                onClick={() => {
-                  if (email && name && phone) {
-                    if (emailFound) {
-                      handleClose();
-                      Shared_Connection.doc(user_id).set({ ...form_Values });
-                      User_Connections.doc(params.id).set(
-                        { time: date },
-                        { merge: true }
-                      );
-                    } else {
-                      handleClose();
-                      Shared_Connection.add({ ...form_Values });
-                    }
-                  }
-                }}
-              >
-                {props.language === "ar" ? "سَلِم" : "Connect"}
-              </Button>
-              <p className="quete">
-                {props.language === "ar"
-                  ? "سلام لا تبيع او تشارك بياناتك"
-                  : "Salam does not sell or share your data"}
-              </p>
-            </Form>
-          </Modal.Body>
-        </Modal>
-      </div>
+              }}
+            >
+              {props.language === "ar" ? "سَلِم" : "Connect"}
+            </Button>
+            <p className="quete">
+              {props.language === "ar"
+                ? "سلام لا تبيع او تشارك بياناتك"
+                : "Salam does not sell or share your data"}
+            </p>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }
