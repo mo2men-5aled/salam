@@ -62,8 +62,8 @@ const Icons = (props) => {
 
   var evideo = property(link, "Embedded Video").value;
 
-  var hText = (property(link, "Header Text")).value;
-  console.log(hText);
+  var hText = property(link, "Header Text").value;
+
   function Check_HTTP(icon, link) {
     if (link) {
       if (link.includes("https://")) {
