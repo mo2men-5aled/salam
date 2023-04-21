@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import firebase from "../Firebase";
 
-import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
+import { Navigate } from "react-router-dom";
 
 import Colors from "./Colors";
 import UserImage from "./User_image";
@@ -91,7 +91,7 @@ class Show extends Component {
     const Color = this.state.user.color;
 
     if (this.state.redirect) {
-      return <Redirect to="/NoData" />;
+      return <Navigate to="/NoData" />;
     }
     return (
       // Profile_Image
