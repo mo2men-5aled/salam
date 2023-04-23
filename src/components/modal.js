@@ -5,9 +5,7 @@ import Form from "react-bootstrap/Form";
 import firebase from "firebase";
 import { useParams } from "react-router-dom";
 
-import Colors from "./Colors";
 import Get_Color from "./get_color";
-import property from "./Get_property_func";
 import Create_Vcard from "./vcard";
 import UserImage from "./User_image";
 
@@ -89,21 +87,19 @@ function PopUpForm(props) {
       <button
         id="bttn"
         onClick={() => {
-          Create_Vcard(props.data, props.username, props.image, params.id);
+          Create_Vcard(props.data, props.user);
           handleShow();
         }}
         className="btn btn-lg text-center"
         style={{
           width: "100%",
           height: "70px",
-          background: `${
-            Get_Color(props.color, Colors, property).value.background
-          }`,
+          background: `${Get_Color(props.user.color)}`,
           color: "white",
           fontWeight: "bold",
         }}
       >
-        {props.language === "ar" ? "حفظ جهة الاتصال" : "Save Contact"}
+        {props.user.language === "ar" ? "حفظ جهة الاتصال" : "Save Contact"}
       </button>
 
       {/* Model form pops up */}
@@ -117,7 +113,7 @@ function PopUpForm(props) {
       >
         <div className="img_div">
           <UserImage
-            User={props.image}
+            User={props.user.image}
             classname="form_image"
             profile="false"
           />
@@ -133,14 +129,14 @@ function PopUpForm(props) {
         </div>
 
         <h4 className="text-center">
-          {props.language === "ar"
+          {props.user.language === "ar"
             ? " شارك معلوماتك مع "
             : "Share your info back with"}
           <p>
-            {props.language === "ar" ? (
-              <>{props.username.name}</>
+            {props.user.language === "ar" ? (
+              <>{props.user.name}</>
             ) : (
-              <>{props.username.name}</>
+              <>{props.user.name}</>
             )}
           </p>
         </h4>
@@ -148,10 +144,10 @@ function PopUpForm(props) {
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               type="email"
               placeholder={
-                props.language === "ar" ? "البريد الالكتروني" : "Email"
+                props.user.language === "ar" ? "البريد الالكتروني" : "Email"
               }
               name="email"
               onChange={(e) => {
@@ -166,9 +162,9 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               type="text"
-              placeholder={props.language === "ar" ? "الاسم" : "Name"}
+              placeholder={props.user.language === "ar" ? "الاسم" : "Name"}
               name="name"
               onChange={(e) => {
                 setName(e.target.value);
@@ -181,10 +177,10 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               type="number"
               placeholder={
-                props.language === "ar" ? "رقم الهاتف" : "Phone Number"
+                props.user.language === "ar" ? "رقم الهاتف" : "Phone Number"
               }
               name="number"
               onChange={(e) => {
@@ -198,11 +194,11 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               type="text"
               name="job title"
               placeholder={
-                props.language === "ar" ? "المسمى الوظيفي" : "Job Title"
+                props.user.language === "ar" ? "المسمى الوظيفي" : "Job Title"
               }
               onChange={(e) => {
                 setJob(e.target.value);
@@ -214,19 +210,19 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               type="text"
               name="company"
-              placeholder={props.language === "ar" ? "الشركة" : "Company"}
+              placeholder={props.user.language === "ar" ? "الشركة" : "Company"}
               onChange={(e) => {
                 setCompany(e.target.value);
               }}
             />
 
             <Form.Control
-              dir={props.language === "ar" ? "rtl" : "ltr"}
+              dir={props.user.language === "ar" ? "rtl" : "ltr"}
               as="textarea"
-              placeholder={props.language === "ar" ? "ملاحظات" : "Notes"}
+              placeholder={props.user.language === "ar" ? "ملاحظات" : "Notes"}
               onChange={(e) => {
                 setNotes(e.target.value);
               }}
@@ -239,9 +235,7 @@ function PopUpForm(props) {
                 width: "100%",
                 borderRadius: "30px",
                 height: "50px",
-                backgroundColor: `${
-                  Get_Color(props.color, Colors, property).value.background
-                }`,
+                backgroundColor: `${Get_Color(props.user.color)}`,
                 color: "white",
                 fontWeight: "bold",
               }}
@@ -261,10 +255,10 @@ function PopUpForm(props) {
                 }
               }}
             >
-              {props.language === "ar" ? "سَلِم" : "Connect"}
+              {props.user.language === "ar" ? "سَلِم" : "Connect"}
             </Button>
             <p className="quete">
-              {props.language === "ar"
+              {props.user.language === "ar"
                 ? "سلام لا تبيع او تشارك بياناتك"
                 : "Salam does not sell or share your data"}
             </p>

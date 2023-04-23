@@ -13,15 +13,17 @@ function property(object, prop) {
   };
 }
 
-const Create_Vcard = async (data, username, user_img) => {
+const Create_Vcard = async (data, user) => {
   const myVCard = new VCard();
 
-  const image = await axios.get(user_img, { responseType: "arraybuffer" });
+  const image = await axios.get(user.image, { responseType: "arraybuffer" });
 
   const imagebase64 = Buffer.from(image.data).toString("base64");
 
   //name
-  const n = username.name.split(" ");
+
+  const name = user.name;
+  const n = name.split(" ");
   const first_name = n[0];
   const last_name = n[1];
   //URLS
@@ -71,8 +73,8 @@ const Create_Vcard = async (data, username, user_img) => {
     .addName(last_name, first_name)
     .addAddress(address)
     .addPhoneNumber(number)
-    .addCompany(username.company)
-    .addJobtitle(username.jobTitle)
+    .addCompany(user.company)
+    .addJobtitle(user.jobTitle)
     .addPhoto(imagebase64)
     .addEmail(mail)
     .addURL(app_link)
@@ -118,7 +120,7 @@ const Create_Vcard = async (data, username, user_img) => {
   var blob = new Blob([myVCard.toString()], {
     type: "text/x-vCard;charset=UTF-8",
   });
-  FileSaver.saveAs(blob, `${username.name}.vcf`);
+  FileSaver.saveAs(blob, `${user.name}.vcf`);
 };
 
 export default Create_Vcard;

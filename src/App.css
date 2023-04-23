@@ -192,3 +192,8 @@
   margin-top: -90px;
   margin-left: 140px;
 }
+
+.panel-default > .panel-heading {
+  color: #fff;
+  background-color: #ff934f;
+}

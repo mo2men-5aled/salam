@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import { auth } from "../Firebase";
 import { Alert, Card, Container, Row, Image } from "react-bootstrap";
 import logo from "../assets/dark.png";
+import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -33,7 +34,7 @@ const ForgotPassword = () => {
           className="justify-content-center align-items-center"
         >
           <Card style={{ width: "30rem" }}>
-            <div className="text-center p-3">
+            <div className="text-center pt-5">
               <Image
                 src={logo}
                 alt="logo"
@@ -43,6 +44,7 @@ const ForgotPassword = () => {
               />
               <h1>{!sent ? "Forgot Password" : "Check Email"}</h1>
             </div>
+            <hr className="hr" />
 
             <Card.Body>
               {!sent ? (
@@ -64,6 +66,7 @@ const ForgotPassword = () => {
                     ) : (
                       <Alert variant="warning">
                         We will send you an email with a link to reset your
+                        password.
                       </Alert>
                     )}
                   </div>
@@ -76,6 +79,12 @@ const ForgotPassword = () => {
                   >
                     Submit
                   </Button>
+                  <hr className="hr" />
+                  <Link to="/user/login">
+                    <Button variant="link" style={{ width: "100%" }}>
+                      Back to Login
+                    </Button>
+                  </Link>
                 </Form>
               ) : (
                 <div className="text-center">

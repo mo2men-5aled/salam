@@ -5,6 +5,7 @@ import LogoImage from "./logoImage";
 
 const UserImage = (props) => {
   const userImage = props.User.image;
+
   const logo = props.User.logoImage;
   const Profile = props.profile;
 

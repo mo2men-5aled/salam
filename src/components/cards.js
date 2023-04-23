@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import firebase from "firebase";
-import Spinner from "./Spinner";
+import { Spinner } from "react-bootstrap";
 
 const IconList = (props) => {
   const [icons, setIcon] = useState();
@@ -17,11 +17,7 @@ const IconList = (props) => {
   }, [props.id]);
 
   if (!icons) {
-    return (
-      <div>
-        <Spinner />
-      </div>
-    );
+    return <Spinner animation="border" variant="dark" />;
   } else {
     return (
       <div className="container text-center">
