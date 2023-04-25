@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import firebase from "firebase";
+import firebase from "../Firebase";
 import Icon_Codes from "./Icon_Links";
 import EmbeddedVideo from "./embedded_video";
 import return_Links from "./links";
 
 import property from "./Get_property_func";
 import { Spinner } from "react-bootstrap";
-
 import { useParams } from "react-router-dom";
 
 const Icons = (props) => {
@@ -101,9 +100,7 @@ const Icons = (props) => {
                       rel="noopener noreferrer external"
                     >
                       <img
-                        src={
-                          Object.values(Icon_Codes.find((x) => x[icon]))[0][0]
-                        }
+                        src={Object.values(Icon_Codes.find((x) => x[icon]))[0]}
                         alt="icon"
                         className="img-icon"
                       />
