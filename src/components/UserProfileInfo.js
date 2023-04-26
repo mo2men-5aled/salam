@@ -1,11 +1,16 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Col, Row, Container, Card, Spinner, Form } from "react-bootstrap";
-import firebase from "../Firebase";
+import { Col, Row, Card, Spinner, Form, Button } from "react-bootstrap";
+import { db } from "../Firebase";
 import dark_image from "../assets/dark.png";
 
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+
+import { auth } from "../Firebase";
+
 const UserProfileInfo = () => {
+  console.log(auth.currentUser);
   const { id } = useParams();
   const [user, setUser] = React.useState("");
 
@@ -21,42 +26,36 @@ const UserProfileInfo = () => {
 
   useEffect(() => {
     // get user data from firebase and pass it to the components
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(id)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          setUser(doc.data());
-          setAddress(doc.data().address);
-          setBio(doc.data().bio);
-          setCompany(doc.data().company);
-          setJobTitle(doc.data().jobTitle);
-          setName(doc.data().name);
-        }
-      });
+    const ref = doc(db, "users", id);
+    getDoc(ref).then((doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        setUser(data);
+        setAddress(data.address);
+        setBio(data.bio);
+        setCompany(data.company);
+        setJobTitle(data.jobTitle);
+        setName(data.name);
+      }
+    });
   }, [id]);
 
   //update user data
-  const updateProfile = () => {
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(id)
-      .update({
-        name: name,
-        jobTitle: jobTitle,
-        company: company,
-        address: address,
-        bio: bio,
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
+
+  const updateProfile = async () => {
+    try {
+      const userDocRef = doc(db, "users", id);
+      await updateDoc(userDocRef, {
+        name,
+        jobTitle,
+        company,
+        address,
+        bio,
       });
+      console.log("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile: ", error);
+    }
   };
 
   if (!user) {
@@ -194,6 +193,9 @@ const UserProfileInfo = () => {
                       />
                     </Col>
                   </Row>
+                  <Button variant="primary" onClick={updateProfile}>
+                    Update Profile
+                  </Button>
                 </Form>
               </div>
             </div>

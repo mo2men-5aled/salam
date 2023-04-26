@@ -3,12 +3,13 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Card, Button, Row, Col, Form, ButtonGroup } from "react-bootstrap";
 import return_Links from "./links";
 import property from "./Get_property_func";
-import firebase from "../Firebase";
+import { db } from "../Firebase";
 import { useParams } from "react-router-dom";
 import Icon_Codes from "./Icon_Links";
 
 import Check_HTTP from "./Check_Http";
 import CustomModal from "../modals/modal";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 function List({ triggerAction, setTriggerAction }) {
   const [show, setShow] = useState(false);
@@ -23,54 +24,45 @@ function List({ triggerAction, setTriggerAction }) {
 
   useEffect(() => {
     if (!triggerAction) {
-      firebase
-        .firestore()
-        .collection("links")
-        .doc(`${id}`)
-        .get()
+      const ref = doc(db, "links", id);
+      getDoc(ref)
         .then((link) => {
-          if (link.exists) {
+          if (link.exists()) {
             setLink(link.data());
           }
+        })
+        .catch((error) => {
+          console.log("Error getting document:", error);
         });
     }
     if (setTriggerAction !== false) setTriggerAction(false);
 
-    firebase
-      .firestore()
-      .collection("titles")
-      .doc(`${id}`)
-      .get()
+    const ref1 = doc(db, "titles", id);
+    getDoc(ref1)
       .then((icon) => {
         setIcons(icon.data().list);
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
       });
   }, [setTriggerAction, triggerAction, id]);
 
   const handleUpdateItem = useCallback(
     (item, FieldVal) => {
-      firebase
-        .firestore()
-        .collection("links")
-        .doc(`${id}`)
-        .update({
-          [item]: FieldVal,
-        });
+      const ref = doc(db, "links", id);
+      updateDoc(ref, {
+        [item]: FieldVal,
+      });
       setTriggerAction(true);
     },
     [id, setTriggerAction]
   );
-
   const handleDeleteItem = useCallback(
     (item) => {
-      //delete one item from the list on fire base
-      firebase
-        .firestore()
-        .collection("links")
-        .doc(`${id}`)
-        .update({
-          [item]: "",
-        });
-
+      const ref = doc(db, "links", id);
+      updateDoc(ref, {
+        [item]: "",
+      });
       setTriggerAction(true);
     },
     [id, setTriggerAction]
@@ -87,7 +79,8 @@ function List({ triggerAction, setTriggerAction }) {
       setIcons(itemsCopy);
 
       // post the new arrangement to the firebase
-      firebase.firestore().collection("titles").doc(`${id}`).update({
+      const ref = doc(db, "titles", id);
+      updateDoc(ref, {
         list: itemsCopy,
       });
 
@@ -95,7 +88,6 @@ function List({ triggerAction, setTriggerAction }) {
     },
     [id, icons, setTriggerAction]
   );
-
   const [FormUpdateField, setFormUpdateField] = useState("");
 
   return (
@@ -235,6 +227,8 @@ function List({ triggerAction, setTriggerAction }) {
                     )}
                   </Draggable>
                 );
+              } else {
+                return null;
               }
             })}
             {provided.placeholder}

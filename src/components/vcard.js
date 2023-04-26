@@ -1,6 +1,7 @@
 import VCard from "vcard-creator";
 import FileSaver from "file-saver";
 import axios from "axios";
+import { Buffer } from "buffer";
 
 function property(object, prop) {
   return {

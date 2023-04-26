@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import firebase from "firebase";
+import { db } from "../Firebase";
 import { Spinner } from "react-bootstrap";
 
 const IconList = (props) => {
   const [icons, setIcon] = useState();
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("titles")
-      .doc(`${props.id}`)
-      .get()
-      .then((ic) => {
-        setIcon(ic.data());
-      });
+    const fetchData = async () => {
+      const docRef = doc(db, "titles", `${props.id}`);
+      const docSnap = await getDoc(docRef);
+      setIcon(docSnap.data());
+    };
+    fetchData();
   }, [props.id]);
 
   if (!icons) {

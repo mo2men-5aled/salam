@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import firebase from "../Firebase";
+import { db } from "../Firebase";
 import Icon_Codes from "./Icon_Links";
 import EmbeddedVideo from "./embedded_video";
 import return_Links from "./links";
@@ -8,6 +8,8 @@ import property from "./Get_property_func";
 import { Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
+import { doc, getDoc, setDoc, collection } from "firebase/firestore";
+
 const Icons = (props) => {
   const { id } = useParams();
   const date = new Date().toDateString();
@@ -15,25 +17,19 @@ const Icons = (props) => {
   const [icons, setIcon] = useState();
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("links")
-      .doc(`${id}`)
-      .get()
-      .then((link) => {
-        if (link.exists) {
-          setLink(link.data());
-        }
-      });
+    const fetchLinkAndIcon = async () => {
+      const linkDocRef = doc(db, "links", `${id}`);
+      const linkDocSnap = await getDoc(linkDocRef);
+      if (linkDocSnap.exists()) {
+        setLink(linkDocSnap.data());
+      }
 
-    firebase
-      .firestore()
-      .collection("titles")
-      .doc(`${id}`)
-      .get()
-      .then((ic) => {
-        setIcon(ic.data());
-      });
+      const iconDocRef = doc(db, "titles", `${id}`);
+      const iconDocSnap = await getDoc(iconDocRef);
+      setIcon(iconDocSnap.data());
+    };
+
+    fetchLinkAndIcon();
   }, [id]);
 
   if (!icons) {
@@ -68,6 +64,12 @@ const Icons = (props) => {
   const index_of_HT = icons.list.indexOf("Header Text");
   icons.list.splice(index_of_HT, 1);
 
+  const handleTap = async (icon) => {
+    const tapsRef = collection(doc(db, "users", id), "taps");
+    const tapDocRef = doc(tapsRef);
+    await setDoc(tapDocRef, { type: icon, time: date }, { merge: true });
+  };
+
   return (
     <div>
       <h1 className="text-center">{hText}</h1>
@@ -80,13 +82,7 @@ const Icons = (props) => {
                   className="col-4"
                   key={Math.random()}
                   onClick={() => {
-                    firebase
-                      .firestore()
-                      .collection("users")
-                      .doc(props.id)
-                      .collection("taps")
-                      .doc()
-                      .set({ type: icon, time: date }, { merge: true });
+                    handleTap(icon);
                   }}
                 >
                   <div className="profile-card-social__item-white">

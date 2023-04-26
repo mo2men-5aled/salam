@@ -2,16 +2,34 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import firebase from "firebase";
+
 import { useParams } from "react-router-dom";
 
 import Get_Color from "./get_color";
 import Create_Vcard from "./vcard";
 import UserImage from "./User_image";
 
+import { db } from "../Firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  setDoc,
+  addDoc,
+} from "firebase/firestore";
+
 function PopUpForm(props) {
   const date = new Date().toDateString();
   const date_time = new Date().toLocaleTimeString();
+
+  //modal states
+  const [show, setShow] = useState(false);
+
+  //modal functions
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   //form states
   const [email, setEmail] = useState("");
@@ -21,7 +39,7 @@ function PopUpForm(props) {
   const [company, setCompany] = useState("");
   const [notes, setNotes] = useState("");
 
-  const [emailFound, setEmailFound] = useState(true);
+  const [emailFound, setEmailFound] = useState(false);
 
   const [user_id, setUser_id] = useState("empty");
 
@@ -39,46 +57,47 @@ function PopUpForm(props) {
     bgImage: "",
     instagram: "",
   };
-  const Data_Share = firebase.firestore().collection("users");
+  const Data_Share = collection(db, "users");
 
   const get_user_id_by_mail = async () => {
-    const response = await Data_Share.where("email", "==", email).get();
+    const querySnapshot = await getDocs(
+      query(Data_Share, where("email", "==", email))
+    );
 
-    setUser_id(response.docs[0].id);
+    setUser_id(querySnapshot.docs[0].id);
   };
 
-  const params = useParams();
-
-  //to post the user's data to the database in the connections collection
-  const User_Connections = firebase
-    .firestore()
-    .collection("users")
-    .doc(user_id)
-    .collection("connections");
-
-  const Shared_Connection = firebase
-    .firestore()
-    .collection("users")
-    .doc(params.id)
-    .collection("connectionData");
+  const { id } = useParams();
 
   var Users_Emails = [];
 
-  Data_Share.get().then((snapshot) => {
-    snapshot.docs.forEach((doc) => {
+  getDocs(Data_Share).then((querySnapshot) => {
+    querySnapshot.docs.forEach((doc) => {
       Users_Emails.push(doc.data().email);
     });
   });
 
-  //modal states
-  const [show, setShow] = useState(false);
-
-  //modal functions
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (email && name && phone) {
+      if (emailFound) {
+        handleClose();
+
+        setDoc(doc(db, "users", props.user.id, "connectionData", user_id), {
+          ...form_Values,
+        });
+
+        setDoc(doc(db, "users", user_id, "connections", id), {
+          time: date,
+        });
+      } else {
+        handleClose();
+        addDoc(collection(db, "users", props.user.id, "connectionData"), {
+          ...form_Values,
+        });
+      }
+    }
   };
 
   return (
@@ -152,11 +171,6 @@ function PopUpForm(props) {
               name="email"
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (Users_Emails.includes(e.target.value)) {
-                  setEmailFound(true);
-                } else {
-                  setEmailFound(false);
-                }
               }}
               required
             />
@@ -169,9 +183,19 @@ function PopUpForm(props) {
               onChange={(e) => {
                 setName(e.target.value);
 
-                if (emailFound) {
-                  get_user_id_by_mail();
+                if (Users_Emails.includes(email)) {
+                  setEmailFound(true);
                 }
+
+                // Users_Emails.map((Listemail) => {
+                //   if (Listemail === email) {
+                //     setEmailFound(true);
+                //   }
+                // });
+
+                // if (emailFound) {
+                //   get_user_id_by_mail();
+                // }
               }}
               required
             />
@@ -239,21 +263,6 @@ function PopUpForm(props) {
                 color: "white",
                 fontWeight: "bold",
               }}
-              onClick={() => {
-                if (email && name && phone) {
-                  if (emailFound) {
-                    handleClose();
-                    Shared_Connection.doc(user_id).set({ ...form_Values });
-                    User_Connections.doc(params.id).set(
-                      { time: date },
-                      { merge: true }
-                    );
-                  } else {
-                    handleClose();
-                    Shared_Connection.add({ ...form_Values });
-                  }
-                }
-              }}
             >
               {props.user.language === "ar" ? "سَلِم" : "Connect"}
             </Button>
@@ -268,5 +277,4 @@ function PopUpForm(props) {
     </div>
   );
 }
-
 export default PopUpForm;

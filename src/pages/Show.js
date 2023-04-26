@@ -10,9 +10,10 @@ import MetaDeco from "../components/metaDeco";
 import BgImage from "../components/bg_image";
 import NavBar from "../components/navbar";
 import property from "../components/Get_property_func";
-import firebase from "../Firebase";
 import "../App.css";
 import PopUpForm from "../components/modal";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../Firebase";
 
 function Get_bg_Color(Color) {
   if (Color) {
@@ -34,36 +35,35 @@ const Show = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    const ref = firebase // User_ID
-      .firestore()
-      .collection("users")
-      .doc(id);
+    const ref = doc(db, "users", id);
+    const ref1 = doc(db, "links", id);
 
-    const ref1 = firebase // User Links
-      .firestore()
-      .collection("links")
-      .doc(id);
+    getDoc(ref)
+      .then((doc) => {
+        if (doc.exists()) {
+          setUser(doc.data());
+          setIsLoading(false);
+        } else {
+          setRedirect(true); // Redirect to NOData
+        }
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+      });
 
-    ref.get().then((doc) => {
-      //doc ----> User's Data & Colour
-      if (doc.exists) {
-        setUser(doc.data());
-        setIsLoading(false);
-      } else {
-        setRedirect(true); // Redirect to NOData
-      }
-    });
-
-    ref1.get().then((doc) => {
-      //-----> User's Links
-      if (doc.exists) {
-        setLink(doc.data());
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        console.log("No such document!");
-      }
-    });
+    getDoc(ref1)
+      .then((doc) => {
+        if (doc.exists()) {
+          setLink(doc.data());
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        console.log("Error getting document:", error);
+      });
   }, [id]);
 
   if (isLoading) {
