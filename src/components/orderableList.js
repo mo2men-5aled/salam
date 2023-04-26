@@ -1,35 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Card, Button, Row, Col, Form } from "react-bootstrap";
+import { Card, Button, Row, Col, Form, ButtonGroup } from "react-bootstrap";
 import return_Links from "./links";
 import property from "./Get_property_func";
 import firebase from "../Firebase";
 import { useParams } from "react-router-dom";
 import Icon_Codes from "./Icon_Links";
 
+import Check_HTTP from "./Check_Http";
 import CustomModal from "../modals/modal";
 
-function Check_HTTP(icon, link) {
-  if (link) {
-    if (link.includes("https://")) {
-      return link;
-    } else if (icon === "Call" || icon === "Number") {
-      return link;
-    } else {
-      return "https://" + link;
-    }
-  } else {
-    return null;
-  }
-}
+function List({ triggerAction, setTriggerAction }) {
+  const [show, setShow] = useState(false);
 
-function List() {
-  //modal state
-  const [modalShow, setModalShow] = React.useState(false);
-
-  //modal handlers
-  const handleShow = () => setModalShow(true);
-  const handleClose = () => setModalShow(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const { id } = useParams();
 
@@ -37,16 +22,19 @@ function List() {
   const [icons, setIcons] = useState([]);
 
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("links")
-      .doc(`${id}`)
-      .get()
-      .then((link) => {
-        if (link.exists) {
-          setLink(link.data());
-        }
-      });
+    if (!triggerAction) {
+      firebase
+        .firestore()
+        .collection("links")
+        .doc(`${id}`)
+        .get()
+        .then((link) => {
+          if (link.exists) {
+            setLink(link.data());
+          }
+        });
+    }
+    if (setTriggerAction !== false) setTriggerAction(false);
 
     firebase
       .firestore()
@@ -56,36 +44,57 @@ function List() {
       .then((icon) => {
         setIcons(icon.data().list);
       });
-  }, []);
+  }, [setTriggerAction, triggerAction, id]);
 
-  function handleUpdateItem(item, FieldVal) {
-    firebase
-      .firestore()
-      .collection("links")
-      .doc(`${id}`)
-      .update({
-        [item]: FieldVal,
+  const handleUpdateItem = useCallback(
+    (item, FieldVal) => {
+      firebase
+        .firestore()
+        .collection("links")
+        .doc(`${id}`)
+        .update({
+          [item]: FieldVal,
+        });
+      setTriggerAction(true);
+    },
+    [id, setTriggerAction]
+  );
+
+  const handleDeleteItem = useCallback(
+    (item) => {
+      //delete one item from the list on fire base
+      firebase
+        .firestore()
+        .collection("links")
+        .doc(`${id}`)
+        .update({
+          [item]: "",
+        });
+
+      setTriggerAction(true);
+    },
+    [id, setTriggerAction]
+  );
+
+  const handleDragEnd = useCallback(
+    (result) => {
+      if (!result.destination) return;
+
+      const itemsCopy = Array.from(icons);
+      const [reorderedItem] = itemsCopy.splice(result.source.index, 1);
+      itemsCopy.splice(result.destination.index, 0, reorderedItem);
+
+      setIcons(itemsCopy);
+
+      // post the new arrangement to the firebase
+      firebase.firestore().collection("titles").doc(`${id}`).update({
+        list: itemsCopy,
       });
-  }
 
-  const handleDeleteItem = () => {
-    console.log("delete");
-  };
-
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const itemsCopy = Array.from(icons);
-    const [reorderedItem] = itemsCopy.splice(result.source.index, 1);
-    itemsCopy.splice(result.destination.index, 0, reorderedItem);
-
-    setIcons(itemsCopy);
-
-    // post the new arrangement to the firebase
-    firebase.firestore().collection("titles").doc(`${id}`).update({
-      list: itemsCopy,
-    });
-  };
+      setTriggerAction(true);
+    },
+    [id, icons, setTriggerAction]
+  );
 
   const [FormUpdateField, setFormUpdateField] = useState("");
 
@@ -93,7 +102,7 @@ function List() {
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="items">
         {(provided) => (
-          <ul
+          <div
             className="list-unstyled"
             {...provided.droppableProps}
             ref={provided.innerRef}
@@ -113,7 +122,9 @@ function List() {
                         {...provided.dragHandleProps}
                         className="mb-3"
                       >
-                        <Card.Header>{item}</Card.Header>
+                        <Card.Header>
+                          <div className="d-flex ">{item}</div>
+                        </Card.Header>
                         <Row className="align-items-center">
                           <Col xs={2} sm={2} md={1} lg={1}>
                             <div className="p-2">
@@ -135,75 +146,86 @@ function List() {
 
                           <Col xs={10} sm={10} md={11} lg={11}>
                             <Card.Body>
-                              <div className="d-flex">
-                                <div className="me-auto">
-                                  <Card.Title
-                                    style={{
-                                      wordWrap: "break-word",
-                                      overflowWrap: "break-word",
-                                      hyphens: "auto",
-                                    }}
-                                  >
-                                    {property(links, item).value}
-                                  </Card.Title>
-                                </div>
-                                <div className="ms-auto">
-                                  <CustomModal header={item}>
-                                    <Form>
-                                      <Form.Group
-                                        className="mb-3"
-                                        controlId="exampleForm.ControlInput1"
-                                      >
-                                        <Form.Label>Email address</Form.Label>
-                                        <Form.Control
-                                          autoFocus
-                                          type="text"
-                                          placeholder="
-                                          Enter new link"
-                                          onChange={(e) =>
-                                            setFormUpdateField(e.target.value)
-                                          }
-                                        />
-                                        <Form.Text className="text-muted">
-                                          Current: {property(links, item).value}
-                                        </Form.Text>
-                                      </Form.Group>
-                                      <Button
-                                        variant="dark"
-                                        onClick={() => {
-                                          handleUpdateItem(
-                                            item,
-                                            FormUpdateField
-                                          );
-                                          handleClose();
-                                        }}
-                                        style={{
-                                          width: "100%",
-                                        }}
-                                      >
-                                        Save Changes
-                                      </Button>
-                                    </Form>
-                                  </CustomModal>
-                                  <Button
-                                    variant="danger"
-                                    onClick={() => handleDeleteItem(index)}
-                                  >
-                                    Delete
-                                  </Button>
+                              <div>
+                                <span>{property(links, item).value}</span>
+                              </div>
 
-                                  <Button variant="link">
-                                    <i
-                                      className="fa-solid fa-share-from-square text-muted"
-                                      href={Check_HTTP(
-                                        item,
-                                        return_Links(
-                                          item,
-                                          property(links, item).value
-                                        )
-                                      )}
-                                    ></i>
-                                  </Button>
+                              <div className="d-flex justify-content-end">
+                                <div className="ms-auto">
+                                  <div className="d-flex justify-content-end">
+                                    <ButtonGroup>
+                                      <CustomModal
+                                        show={show}
+                                        handleClose={handleClose}
+                                        handleShow={handleShow}
+                                        header={`Update ${item}`}
+                                        ButtonIcon={
+                                          <i className="fa-solid fa-edit text-muted"></i>
+                                        }
+                                        FooterChildren={
+                                          <>
+                                            <Button
+                                              variant="danger"
+                                              onClick={() => {
+                                                handleDeleteItem(item);
+                                                handleClose();
+                                              }}
+                                            >
+                                              Delete
+                                            </Button>
+                                            <Button
+                                              variant="dark"
+                                              onClick={() => {
+                                                handleUpdateItem(
+                                                  item,
+                                                  FormUpdateField
+                                                );
+                                              }}
+                                            >
+                                              Update
+                                            </Button>
+                                          </>
+                                        }
+                                      >
+                                        <Form>
+                                          <Form.Group className="mb-3">
+                                            <Form.Label>
+                                              Update Field
+                                            </Form.Label>
+                                            <Form.Control
+                                              autoFocus
+                                              type="text"
+                                              placeholder="
+                                          Enter new link"
+                                              onChange={(e) =>
+                                                setFormUpdateField(
+                                                  e.target.value
+                                                )
+                                              }
+                                            />
+                                            <Form.Text className="text-muted">
+                                              Current:{" "}
+                                              {property(links, item).value}
+                                            </Form.Text>
+                                          </Form.Group>
+                                        </Form>
+                                      </CustomModal>
+
+                                      <Button variant="link">
+                                        <i
+                                          className="fa-solid fa-share-from-square"
+                                          href={Check_HTTP(
+                                            item,
+                                            return_Links(
+                                              item,
+                                              property(links, item).value
+                                            )
+                                          )}
+                                          _target="blank"
+                                        ></i>
+                                      </Button>
+                                    </ButtonGroup>
+                                  </div>
                                 </div>
                               </div>
                             </Card.Body>
@@ -216,7 +238,7 @@ function List() {
               }
             })}
             {provided.placeholder}
-          </ul>
+          </div>
         )}
       </Droppable>
     </DragDropContext>
