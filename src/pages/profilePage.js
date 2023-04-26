@@ -6,7 +6,8 @@ import OrderableList from "../components/orderableList";
 import UserProfileInfo from "../components/UserProfileInfo";
 
 const ProfilePage = () => {
-  const [trigerAction, setTrigerAction] = useState(false);
+  const [triggerAction, setTriggerAction] = useState(false);
+
   return (
     <div style={{ backgroundColor: "#ededed" }}>
       <Navbar />
@@ -15,8 +16,8 @@ const ProfilePage = () => {
         <Card className="mb-5">
           <Card.Body>
             <OrderableList
-              trigerAction={trigerAction}
-              setTrigerAction={setTrigerAction}
+              triggerAction={triggerAction}
+              setTriggerAction={setTriggerAction}
             />
           </Card.Body>
         </Card>
