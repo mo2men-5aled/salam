@@ -96,7 +96,7 @@ const Icons = (props) => {
                       rel="noopener noreferrer external"
                     >
                       <img
-                        src={Object.values(Icon_Codes.find((x) => x[icon]))[0]}
+                        src={Icon_Codes[icon]}
                         alt="icon"
                         className="img-icon"
                       />
