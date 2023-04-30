@@ -5,6 +5,7 @@ import { auth } from "../Firebase";
 import { Alert, Card, Container, Row, Image } from "react-bootstrap";
 import logo from "../assets/dark.png";
 import { Link } from "react-router-dom";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -12,14 +13,15 @@ const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    auth
-      .sendPasswordResetEmail(email)
+    setError("");
+    sendPasswordResetEmail(auth, email)
       .then(() => {
         setSent(true);
       })
       .catch((error) => {
-        setError(error.message);
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setError(errorMessage);
       });
   };
   return (
