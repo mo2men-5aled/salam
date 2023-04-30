@@ -7,10 +7,9 @@ import dark_image from "../assets/dark.png";
 
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
-import { auth } from "../Firebase";
+import whiteLogo from "../assets/white_logo.png";
 
 const UserProfileInfo = () => {
-  console.log(auth.currentUser);
   const { id } = useParams();
   const [user, setUser] = React.useState("");
 
@@ -82,7 +81,7 @@ const UserProfileInfo = () => {
             <Card>
               <Card.Img
                 variant="top"
-                src={user.backgroundImage}
+                src={user.backgroundImage ? user.backgroundImage : whiteLogo}
                 style={{
                   objectFit: "cover",
                   objectPosition: "50%",
