@@ -48,8 +48,11 @@ const ProfilePage = () => {
   return (
     <div style={{ backgroundColor: "#ededed" }}>
       <Navbar />
+      <UserProfileInfo
+        triggerAction={triggerAction}
+        setTriggerAction={setTriggerAction}
+      />
       <Container>
-        <UserProfileInfo />
         <Card className="mb-5">
           <Card.Body>
             <ControlledTabs

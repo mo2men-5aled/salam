@@ -6,7 +6,15 @@ import { arrayMoveImmutable as arrayMove } from "array-move";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase";
-import { Card, Row, Col, ButtonGroup, Button, Form } from "react-bootstrap";
+import {
+  Card,
+  Row,
+  Col,
+  ButtonGroup,
+  Button,
+  Form,
+  Spinner,
+} from "react-bootstrap";
 import Icon_Codes from "./Icon_Links";
 import Check_HTTP from "./Check_Http";
 import CustomModal from "../modals/modal";
@@ -171,11 +179,10 @@ const SortableList = SortableContainer(
   }
 );
 
-const MyComponent = ({ triggerAction, setTriggerAction }) => {
+const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
   const { id } = useParams();
 
   const [links, setLink] = useState("");
-  const [icons, setIcons] = useState([]);
 
   //Update Modal state
   const [UpdateModalshow, setUpdateModalShow] = useState(false);
@@ -207,15 +214,6 @@ const MyComponent = ({ triggerAction, setTriggerAction }) => {
         });
     }
     if (setTriggerAction !== false) setTriggerAction(false);
-
-    const ref1 = doc(db, "titles", id);
-    getDoc(ref1)
-      .then((icon) => {
-        setIcons(icon.data().list);
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
   }, [id, triggerAction, setTriggerAction]);
 
   // Sortable function
@@ -253,8 +251,19 @@ const MyComponent = ({ triggerAction, setTriggerAction }) => {
     );
   };
 
-  if (!icons) {
-    return <div>Loading...</div>;
+  if (!icons && !links) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "90vh",
+        }}
+      >
+        <Spinner animation="border" variant="dark" />
+      </div>
+    );
   }
 
   return (
@@ -303,6 +312,7 @@ const MyComponent = ({ triggerAction, setTriggerAction }) => {
               onChange={(e) => {
                 setFormField(e.target.value);
               }}
+              autoFocus
             />
             <Form.Text
               className="text-muted"
@@ -322,11 +332,6 @@ const MyComponent = ({ triggerAction, setTriggerAction }) => {
         show={DeleteModalshow}
         handleClose={handleDeleteModalClose}
         header={`Update ${selectedItem}`}
-        Button={
-          <Button variant="outline-dark" onClick={handleDeleteModalShow}>
-            Delete
-          </Button>
-        }
         FooterChildren={
           <Button
             variant="dark"

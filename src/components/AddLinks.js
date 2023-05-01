@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { db } from "../Firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
-import { Card, Row, Col, Button, Form, FormControl } from "react-bootstrap";
+import { Card, Row, Col, Button, Form } from "react-bootstrap";
 import Icon_Codes from "./Icon_Links";
 import CustomModal from "../modals/modal";
 
-const AddLinks = ({ triggerAction, setTriggerAction }) => {
+const AddLinks = ({ setTriggerAction, icons }) => {
   const { id } = useParams();
-  const [icons, setIcons] = useState([]);
 
   const [show, setShow] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
@@ -16,17 +15,6 @@ const AddLinks = ({ triggerAction, setTriggerAction }) => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  useEffect(() => {
-    const ref1 = doc(db, "titles", id);
-    getDoc(ref1)
-      .then((icon) => {
-        setIcons(icon.data().list);
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-  }, [id, triggerAction, setTriggerAction]);
 
   const handleAddLink = (e) => {
     e.preventDefault();
@@ -129,6 +117,7 @@ const AddLinks = ({ triggerAction, setTriggerAction }) => {
               type="text"
               placeholder="Enter Link"
               onChange={(e) => setFormField(e.target.value)}
+              autoFocus
             />
           </Form.Group>
         </Form>
