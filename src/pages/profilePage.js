@@ -20,11 +20,9 @@ const ProfilePage = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserData(user);
-      } else {
-        setUserData({});
       }
     });
-  });
+  }, [userData]);
 
   if (!userData) {
     return (

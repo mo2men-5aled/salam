@@ -100,7 +100,7 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
 
     if (!triggerAction) getUser();
 
-    if (setTriggerAction !== false) setTriggerAction(false);
+    if (triggerAction !== false) setTriggerAction(false);
 
     const handleResize = () => {
       if (window.innerWidth < 600) {
@@ -120,10 +120,6 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
     };
   }, [id, triggerAction, setTriggerAction]);
 
-  //update user data
-
-  console.log(size);
-
   const updateUserData = async () => {
     try {
       setUploading(true);
@@ -137,12 +133,28 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
         bio: bio,
       });
       handleCloseDataModal();
-      window.location.reload();
+      setTriggerAction(true);
     } catch (error) {
       setError(error);
       setUploading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <div
+        style={{
+          display: " block",
+          position: "fixed",
+
+          top: "50%",
+          right: "50%",
+        }}
+      >
+        <Spinner animation="border" variant="dark" />;
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -191,7 +203,14 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
             sm={12}
             md={3}
             lg={3}
-            className="d-flex justify-content-center"
+            style={{
+              position: "relative",
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <Image
               roundedCircle
@@ -206,14 +225,14 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
               alt="User Profile Image"
             />
             <Image
-              className="rounded-circle"
+              roundedCircle
               style={{
                 width: "3.5rem",
                 height: "3.5rem",
                 objectFit: "cover",
                 objectPosition: "60%",
                 border: "0.16rem solid white",
-                margin: "9.5rem 0 0 -4rem",
+                margin: "-4rem 0 0 10rem",
               }}
               src={user.logoImage ? user.logoImage : whiteLogo}
               alt="User Logo Image"
@@ -243,7 +262,9 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: `${
+                      size === "md" || size === "sm" ? "center" : "flex-start"
+                    }`,
                     alignItems: "center",
                   }}
                 >
