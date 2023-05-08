@@ -1,16 +1,25 @@
 import React from "react";
-import Navbar from "../components/navbar";
-
-function Home() {
+import { Image } from "react-bootstrap";
+import BlackLogo from "../assets/dark.png";
+function Home({ triggerAction, setTriggerAction, language }) {
   return (
     <div>
-      <Navbar />
-      <div style={{ display: "grid", justifyItems: "center" }}>
-        <i
-          style={{ fontSize: "70px", marginTop: "50px" }}
-          className="fa-solid fa-house"
-        ></i>
-        <h1 style={{ marginTop: "10px" }}>Home Page :)</h1>
+      <div
+        style={{
+          display: "flex",
+
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#000000",
+        }}
+      >
+        <Image
+          src={BlackLogo}
+          alt="white-logo"
+          border="0"
+          width="400rem"
+          height="400rem"
+        />
       </div>
     </div>
   );

@@ -1,0 +1,69 @@
+import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NoUser from "./pages/NoUser";
+
+import Show from "./pages/Show";
+import Home from "./pages/home.js";
+import LoginPage from "./pages/LoginPage";
+import ForgotPassword from "./pages/forgotPassword";
+import ProfilePage from "./pages/profilePage";
+import ArticlesPage from "./pages/ArticlesPage";
+import ViewArticle from "./pages/ViewArticle";
+import AdminPage from "./pages/AdminPage";
+
+import PrivateRoute from "./privateRouts/privateRoute";
+import RegisterUser from "./pages/RegisterPage";
+
+import NavBar from "./components/navbar";
+
+function AppWrapper() {
+  const [triggerAction, setTriggerAction] = useState(false);
+  const [language, setLanguage] = useState("en");
+  return (
+    <BrowserRouter>
+      <NavBar
+        triggerAction={triggerAction}
+        setTriggerAction={setTriggerAction}
+        language={language}
+        setLanguage={setLanguage}
+      />
+      <Routes>
+        {/* Routes without navbar */}
+        <Route path="/user/login" element={<LoginPage />} />
+        <Route path="/user/register" element={<RegisterUser />} />
+        <Route path="/no-user" element={<NoUser />} />
+        <Route path="/user/forgot-password" element={<ForgotPassword />} />
+
+        {/* Routes with the navbar */}
+        <Route
+          path="/user/profile/:id"
+          element={
+            <PrivateRoute>
+              <ProfilePage
+                language={language}
+                triggerAction={triggerAction}
+                setTriggerAction={setTriggerAction}
+              />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <Home
+              language={language}
+              triggerAction={triggerAction}
+              setTriggerAction={setTriggerAction}
+            />
+          }
+        />
+        <Route path="/:id" element={<Show />} />
+        <Route path="/articles" element={<ArticlesPage />} />
+        <Route path="/article/:id" element={<ViewArticle />} />
+        <Route path="/admin/:id" element={<AdminPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default AppWrapper;

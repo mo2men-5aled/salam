@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../Firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-function ControlledTabs({ triggerAction, setTriggerAction }) {
+function ControlledTabs({ triggerAction, setTriggerAction, language }) {
   const { id } = useParams();
   const [icons, setIcons] = useState([]);
   const [key, setKey] = useState("home");
@@ -23,6 +23,7 @@ function ControlledTabs({ triggerAction, setTriggerAction }) {
           console.log("Error getting document:", error);
         });
     },
+
     [id, triggerAction, setTriggerAction],
     [icons]
   );
@@ -33,16 +34,21 @@ function ControlledTabs({ triggerAction, setTriggerAction }) {
       onSelect={(k) => setKey(k)}
       className="mb-3 justify-content-center"
     >
-      <Tab eventKey="home" title="My Links">
+      <Tab eventKey="home" title={language === "ar" ? "الروابط" : "My Links"}>
         <MyComponent
+          language={language}
           triggerAction={triggerAction}
           setTriggerAction={setTriggerAction}
           icons={icons}
           setIcons={setIcons}
         />
       </Tab>
-      <Tab eventKey="profile" title="Add Links">
+      <Tab
+        eventKey="profile"
+        title={language === "ar" ? "اضافة روابط" : "Add Links"}
+      >
         <AddLinks
+          language={language}
           icons={icons}
           triggerAction={triggerAction}
           setTriggerAction={setTriggerAction}

@@ -15,7 +15,7 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 
-function LoginPage() {
+function LoginPage({ language }) {
   const { currentUser } = React.useContext(AuthContext);
 
   // form state
@@ -201,12 +201,8 @@ function LoginPage() {
             <hr className="hr" />
             <div className="text-center p-3">
               <Form.Text className="text-muted">
-                If you don't have an account, Get Salam app and create one
-                <div>
-                  <a href="https://play.google.com/store/apps/details?id=com.sallam.tech">
-                    Click Here
-                  </a>
-                </div>
+                If you don't have an account, go{" "}
+                <a href="/user/register">Register</a>
               </Form.Text>
             </div>
           </Card>

@@ -27,6 +27,7 @@ const SortableItem = SortableElement(
     handleDeleteModalShow,
     handleUpdateModalShow,
     setSelectedItem,
+    language,
   }) => (
     <Card className="mb-3">
       <Card.Header>
@@ -55,7 +56,7 @@ const SortableItem = SortableElement(
               rel="noreferrer"
             >
               <Button variant="outline-dark" size="sm">
-                Visit
+                {language === "ar" ? "عرض" : "Visit"}
               </Button>
             </a>
           </Col>
@@ -104,7 +105,7 @@ const SortableItem = SortableElement(
                     setSelectedItem(item);
                   }}
                 >
-                  Update
+                  {language === "ar" ? "تعديل" : "Update"}
                 </Button>
                 <Button
                   variant="outline-danger"
@@ -113,7 +114,7 @@ const SortableItem = SortableElement(
                     setSelectedItem(item);
                   }}
                 >
-                  Delete
+                  {language === "ar" ? "حذف" : "Delete"}
                 </Button>
               </ButtonGroup>
             </div>
@@ -140,6 +141,7 @@ const SortableList = SortableContainer(
     FormField,
     setFormField,
     setSelectedItem,
+    language,
   }) => {
     return (
       <ul
@@ -152,6 +154,7 @@ const SortableList = SortableContainer(
           if (links[item]) {
             return (
               <SortableItem
+                language={language}
                 key={`item-${item}`}
                 index={index}
                 value={links[item]}
@@ -179,7 +182,13 @@ const SortableList = SortableContainer(
   }
 );
 
-const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
+const MyComponent = ({
+  triggerAction,
+  setTriggerAction,
+  icons,
+  setIcons,
+  language,
+}) => {
   const { id } = useParams();
 
   const [links, setLink] = useState("");
@@ -281,6 +290,7 @@ const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
         handleDeleteModalClose={handleDeleteModalClose}
         handleDeleteModalShow={handleDeleteModalShow}
         setSelectedItem={setSelectedItem}
+        language={language}
       />
 
       <CustomModal
@@ -289,7 +299,7 @@ const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
         header={`Update ${selectedItem}`}
         Button={
           <Button variant="outline-dark" onClick={handleUpdateModalShow}>
-            Update
+            {language === "ar" ? "تعديل" : "Update"}
           </Button>
         }
         FooterChildren={
@@ -299,16 +309,27 @@ const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
               handleUpdate(selectedItem);
             }}
           >
-            Update
+            {language === "ar" ? "تعديل" : "Update"}
           </Button>
         }
       >
         <Form>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Link</Form.Label>
+          <Form.Group
+            className="mb-3"
+            controlId="formBasicEmail"
+            style={
+              language === "ar" ? { textAlign: "right" } : { textAlign: "left" }
+            }
+          >
+            <Form.Label>{language === "ar" ? "الرابط" : "Link"}</Form.Label>
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               type="text"
-              placeholder="Enter link"
+              placeholder={language === "ar" ? "ادخل الرابط" : "Enter link"}
               onChange={(e) => {
                 setFormField(e.target.value);
               }}
@@ -322,7 +343,9 @@ const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
                 textOverflow: "ellipsis",
               }}
             >
-              Current : {links[selectedItem]}
+              {language === "ar"
+                ? `${links[selectedItem]} الرابط الحالي`
+                : `Current link : ${links[selectedItem]}`}
             </Form.Text>
           </Form.Group>
         </Form>
@@ -339,12 +362,19 @@ const MyComponent = ({ triggerAction, setTriggerAction, icons, setIcons }) => {
               handleDelete(selectedItem);
             }}
           >
-            Delete
+            {language === "ar" ? "حذف" : "Delete"}
           </Button>
         }
       >
-        <Form.Text className="text-muted">
-          Are you sure you want to delete {selectedItem}?
+        <Form.Text
+          className="text-muted"
+          style={
+            language === "ar" ? { textAlign: "right" } : { textAlign: "left" }
+          }
+        >
+          {language === "ar"
+            ? `${selectedItem} هل انت متاكد من انك تريد حذف`
+            : `Are you sure you want to delete ${selectedItem}?`}
         </Form.Text>
       </CustomModal>
     </>

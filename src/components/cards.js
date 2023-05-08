@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../Firebase";
 import { Spinner } from "react-bootstrap";
+import { doc, getDoc } from "firebase/firestore";
 
 const IconList = (props) => {
   const [icons, setIcon] = useState();

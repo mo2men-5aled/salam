@@ -2,30 +2,69 @@ import { useContext, useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Image from "react-bootstrap/Image";
-import { Button, Nav, Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import logo from "../assets/white_logo.png";
 import { auth, db } from "../Firebase";
 import { AuthContext } from "../context/userAuthContext";
 
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
-function NavBar() {
+function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
+  const navigate = useNavigate();
   const user = useContext(AuthContext).currentUser;
   const [name, setName] = useState("");
 
+  const [userID, setUserID] = useState("");
+
+  const handleEnglishLanguage = () => {
+    if (user) {
+      //update language variable in the database
+      updateDoc(doc(db, "users", userID), {
+        language: "en",
+      }).then(() => {
+        setLanguage("en");
+      });
+    } else {
+      setLanguage("en");
+    }
+    setTriggerAction(true);
+  };
+  const handleArabicLanguage = () => {
+    if (user) {
+      //update language variable in the database
+      updateDoc(doc(db, "users", userID), {
+        language: "ar",
+      }).then(() => {
+        setLanguage("ar");
+      });
+    } else {
+      setLanguage("ar");
+    }
+
+    setTriggerAction(true);
+  };
+
   useEffect(() => {
     // get user data with the user id from users collecion
-    if (user) {
-      getDoc(doc(db, "users", user.uid)).then((doc) => {
-        if (doc.exists()) {
-          const data = doc.data();
-          setName(data.name);
-        }
-      });
+
+    if (!triggerAction) {
+      if (user) {
+        getDoc(doc(db, "users", user.uid)).then((doc) => {
+          if (doc.exists()) {
+            const data = doc.data();
+            setName(data.name);
+            setLanguage(data.language);
+            setUserID(data.id);
+          }
+        });
+      }
     }
-  }, [user]);
+
+    if (triggerAction !== false) setTriggerAction(false);
+  }, [user, triggerAction, setTriggerAction, setLanguage, setName, setUserID]);
 
   return (
     <>
@@ -36,65 +75,80 @@ function NavBar() {
             Salam
           </Navbar.Brand>
 
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link
+          <div className="d-flex justify-content-end align-items-center">
+            {language ? (
+              <Button
+                className="me-2"
+                style={{
+                  color: "white",
+                }}
+                variant="link"
                 onClick={() => {
-                  window.location.href = "/articles";
+                  if (language === "en") {
+                    handleArabicLanguage();
+                  } else {
+                    handleEnglishLanguage();
+                  }
                 }}
               >
-                Artilces
-              </Nav.Link>
-              <Nav.Link href="#link">Link</Nav.Link>
-            </Nav>
-            <div className="d-flex justify-content-end">
-              {user === undefined && !name ? (
-                <Spinner animation="border" size="sm" variant="light" />
-              ) : (
-                <div>
-                  {user === null ? (
+                {language}
+              </Button>
+            ) : null}
+            {user === undefined ? (
+              <Spinner animation="border" size="sm" variant="light" />
+            ) : (
+              <div>
+                {user === null ? (
+                  <>
+                    <Link
+                      as={Button}
+                      to="/user/register"
+                      className="me-2 btn btn-outline-light"
+                      variant="dark"
+                    >
+                      {language === "ar" ? "انشاء حساب" : "Register"}
+                    </Link>
                     <Link
                       as={Button}
                       to="/user/login"
                       className="me-2 btn btn-outline-light"
                       variant="dark"
                     >
-                      Login
+                      {language === "ar" ? "تسجيل الدخول" : "Login"}
                     </Link>
-                  ) : (
-                    <>
-                      <div>
-                        <Navbar.Text
-                          className="me-3"
-                          style={{
-                            color: "white",
-                            fontSize: "1 rem",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => {
-                            window.location.href = "/user/profile/" + user.uid;
-                          }}
-                        >
-                          {user.displayName ? user.displayName : name}
-                        </Navbar.Text>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <Navbar.Text
+                        className="me-3"
+                        style={{
+                          color: "white",
+                          fontSize: "1 rem",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          navigate("/user/profile/" + user.uid);
+                        }}
+                      >
+                        {user.displayName ? user.displayName : name}
+                      </Navbar.Text>
 
-                        <Button
-                          className="me-2"
-                          variant="outline-light"
-                          onClick={() => {
-                            auth.signOut();
-                          }}
-                        >
-                          Logout
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          </Navbar.Collapse>
+                      <Button
+                        className="me-2"
+                        variant="outline-light"
+                        onClick={() => {
+                          auth.signOut();
+                        }}
+                      >
+                        {language === "ar" ? "تسجيل الخروج" : "Logout"}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </Container>
       </Navbar>
     </>

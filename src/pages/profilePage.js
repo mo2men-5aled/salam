@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Container, Card } from "react-bootstrap";
 
-import Navbar from "../components/navbar";
 import UserProfileInfo from "../components/UserProfileInfo";
 import { useParams } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
@@ -11,10 +10,9 @@ import { useEffect } from "react";
 import NotAuthorized from "../components/NotAuthorized";
 import ControlledTabs from "../components/Tabs";
 
-const ProfilePage = () => {
+const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
-  const [triggerAction, setTriggerAction] = useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -44,16 +42,23 @@ const ProfilePage = () => {
   }
 
   return (
-    <div style={{ backgroundColor: "#ededed" }}>
-      <Navbar />
+    <div
+      style={{
+        backgroundColor: "#ededed",
+        minHeight: "100vh",
+        paddingBottom: "5rem",
+      }}
+    >
       <UserProfileInfo
+        language={language}
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
       />
       <Container>
-        <Card className="mb-5">
+        <Card>
           <Card.Body>
             <ControlledTabs
+              language={language}
               triggerAction={triggerAction}
               setTriggerAction={setTriggerAction}
             />

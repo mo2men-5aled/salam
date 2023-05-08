@@ -8,7 +8,6 @@ import UserImage from "../components/User_image";
 import Icons from "../components/Icons";
 import MetaDeco from "../components/metaDeco";
 import BgImage from "../components/bg_image";
-import NavBar from "../components/navbar";
 import property from "../components/Get_property_func";
 import "../App.css";
 import PopUpForm from "../components/modal";
@@ -90,7 +89,6 @@ const Show = () => {
     // Profile_Image
     <>
       <MetaDeco bgcolor={Get_bg_Color(user.color)} language={user.language} />
-      <NavBar />
 
       <div>
         <BgImage User={user} />

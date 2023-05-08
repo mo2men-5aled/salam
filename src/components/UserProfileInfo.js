@@ -21,8 +21,12 @@ import { storage } from "../Firebase";
 import whiteLogo from "../assets/white_logo.png";
 import "./fadeImage.css";
 import CustomModal from "../modals/modal";
+import { useNavigate } from "react-router-dom";
 
-const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
+import { getDownloadURL } from "firebase/storage";
+
+const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState("");
 
@@ -61,6 +65,7 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
 
     const uploadTask = uploadBytesResumable(storageRef, image);
 
+    // upload image and get the image link after finish
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -71,9 +76,49 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
         setUploading(false);
       },
       () => {
-        setUploading(false);
-        handleClosePhotoModal();
-        window.location.reload();
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          // update the user profile with the new image link
+          if (folder === "userImage") {
+            updateDoc(doc(db, "users", id), {
+              image: downloadURL,
+            })
+              .then(() => {
+                setUploading(false);
+                setTriggerAction(true);
+                handleClosePhotoModal();
+              })
+              .catch((error) => {
+                setError(error);
+                setUploading(false);
+              });
+          } else if (folder === "backgroundImage") {
+            updateDoc(doc(db, "users", id), {
+              backgroundImage: downloadURL,
+            })
+              .then(() => {
+                setUploading(false);
+                setTriggerAction(true);
+                handleClosePhotoModal();
+              })
+              .catch((error) => {
+                setError(error);
+                setUploading(false);
+              });
+          } else {
+            updateDoc(doc(db, "users", id), {
+              logoImage: downloadURL,
+            })
+              .then(() => {
+                setUploading(false);
+                setTriggerAction(true);
+                handleClosePhotoModal();
+              })
+              .catch((error) => {
+                setError(error);
+                setUploading(false);
+              });
+          }
+        });
       }
     );
   };
@@ -282,18 +327,32 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
                 <div>{user.address}</div>
               </div>
               <div>{user.bio}</div>
-              <Button
-                variant="dark"
-                style={{
-                  margin: "1rem 0 0 0",
-                }}
-                size="sm"
-                onClick={() => {
-                  handleShowDataModal();
-                }}
-              >
-                Edit Info
-              </Button>
+              <>
+                <Button
+                  variant="dark"
+                  style={{
+                    margin: "1rem 0 0 0",
+                  }}
+                  size="sm"
+                  onClick={() => {
+                    handleShowDataModal();
+                  }}
+                >
+                  {language === "ar" ? "تعديل البيانات" : "Edit Info"}
+                </Button>
+                <Button
+                  variant="dark"
+                  style={{
+                    margin: "1rem 0 0 1rem",
+                  }}
+                  size="sm"
+                  onClick={() => {
+                    navigate(`/${user.id}`);
+                  }}
+                >
+                  {language === "ar" ? "عرض البطاقة" : "Preview Card"}
+                </Button>
+              </>
             </div>
           </Col>
         </Row>
@@ -302,7 +361,9 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
       <CustomModal
         show={showPhotoModal}
         handleClose={handleClosePhotoModal}
-        header="Edit Profile"
+        header={
+          language === "ar" ? "تعديل صور الملف الشخصي" : "Edit Profile Images"
+        }
         FooterChildren={
           <Button
             variant="dark"
@@ -312,26 +373,48 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
               handleUpdateBGImage();
             }}
           >
-            Save
+            {language === "ar" ? "حفظ" : "Save"}
           </Button>
         }
       >
         <Form onSubmit={handleUpdateBGImage}>
-          <Form.Select onChange={handleSelectChange}>
-            <option value="default">Select Image Type</option>
-            <option value="backgroundImage">Background Image</option>
-            <option value="userImage">Profile Image</option>
-            <option value="logoImage">Logo Image</option>
+          <Form.Select
+            onChange={handleSelectChange}
+            style={
+              language === "ar" ? { textAlign: "right" } : { textAlign: "left" }
+            }
+          >
+            <option value="default">
+              {language === "ar" ? "اختر نوع الصورة" : "Select Image Type"}
+            </option>
+            <option value="backgroundImage">
+              {language === "ar" ? "صورة الغلاف" : "Background Image"}
+            </option>
+            <option value="userImage">
+              {language === "ar" ? "الصورة الشخصيه" : "Profile Image"}
+            </option>
+            <option value="logoImage">
+              {language === "ar" ? "اللوجو" : "Logo Image"}
+            </option>
           </Form.Select>
           <Form.Group
             className="mb-3"
             controlId="formBasicEmail"
-            style={{
-              margin: "1rem 0 0 0",
-            }}
+            style={
+              language === "ar"
+                ? { textAlign: "right", margin: "1rem 0 0 0" }
+                : { textAlign: "left", margin: "1rem 0 0 0" }
+            }
           >
-            <Form.Label>Upload Image </Form.Label>
+            <Form.Label>
+              {language === "ar" ? "تحميل صورة" : "Upload Image"}
+            </Form.Label>
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               accept="image/*"
               type="file"
               onChange={handleFileSelect}
@@ -343,7 +426,11 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
             ) : (
               <div>
                 {!uploading ? (
-                  <Alert variant="warning">Please Upload an image</Alert>
+                  <Alert variant="warning">
+                    {language === "ar"
+                      ? "برجاء تحميل صورة واحده"
+                      : "Please Upload an image"}
+                  </Alert>
                 ) : (
                   <Spinner animation="border" variant="dark" />
                 )}
@@ -356,7 +443,7 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
       <CustomModal
         show={showDataModal}
         handleClose={handleCloseDataModal}
-        header="Edit Profile"
+        header={language === "ar" ? "تعديل الملف الشخصي" : "Edit Profile"}
         FooterChildren={
           <Button
             variant="dark"
@@ -365,16 +452,20 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
               updateUserData();
             }}
           >
-            Save
+            {language === "ar" ? "حفظ" : "Save"}
           </Button>
         }
       >
         <Form onSubmit={updateUserData}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Update Your Data </Form.Label>
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               type="text"
-              placeholder="Enter Your Name"
+              placeholder={language === "ar" ? "ادخل الاسم" : "Enter Your Name"}
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
@@ -382,31 +473,59 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
             />
             <Form.Control
               type="text"
-              placeholder="Enter Your Job Title"
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
+              placeholder={
+                language === "ar"
+                  ? "ادخل المسمى الوظيفي"
+                  : "Enter Your Job Title"
+              }
               value={jobTitle}
               onChange={(e) => {
                 setJobTitle(e.target.value);
               }}
             />
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               type="text"
-              placeholder="Enter Your Company"
+              placeholder={
+                language === "ar" ? "ادخل اسم الشركه" : "Enter Your Company"
+              }
               value={company}
               onChange={(e) => {
                 setCompany(e.target.value);
               }}
             />
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               type="text"
-              placeholder="Enter Your Address"
+              placeholder={
+                language === "ar" ? "ادخل العنوان" : "Enter Your Address"
+              }
               value={address}
               onChange={(e) => {
                 setAddress(e.target.value);
               }}
             />
             <Form.Control
+              style={
+                language === "ar"
+                  ? { textAlign: "right" }
+                  : { textAlign: "left" }
+              }
               type="text"
-              placeholder="Enter Your Bio"
+              placeholder={language === "ar" ? "ادخل الوصف" : "Enter Your Bio"}
               value={bio}
               onChange={(e) => {
                 setBio(e.target.value);
@@ -419,7 +538,11 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction }) => {
             ) : (
               <div>
                 {!uploading ? (
-                  <Alert variant="warning">Don't foget to save Updates</Alert>
+                  <Alert variant="warning">
+                    {language === "ar"
+                      ? "لا تنسى حفظ التغيرات"
+                      : "Don't foget to save Updates"}
+                  </Alert>
                 ) : (
                   <Spinner animation="border" variant="dark" />
                 )}

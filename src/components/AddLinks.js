@@ -6,7 +6,7 @@ import { Card, Row, Col, Button, Form } from "react-bootstrap";
 import Icon_Codes from "./Icon_Links";
 import CustomModal from "../modals/modal";
 
-const AddLinks = ({ setTriggerAction, icons }) => {
+const AddLinks = ({ setTriggerAction, icons, language }) => {
   const { id } = useParams();
 
   const [show, setShow] = useState(false);
@@ -26,8 +26,6 @@ const AddLinks = ({ setTriggerAction, icons }) => {
         console.log("Document successfully updated!");
         setTriggerAction(true);
         handleClose();
-
-        console.log(selectedItem, " ", FormField);
       })
       .catch((error) => {
         console.error("Error updating document: ", error);
@@ -83,7 +81,7 @@ const AddLinks = ({ setTriggerAction, icons }) => {
                       setSelectedItem(icon);
                     }}
                   >
-                    Add Link
+                    {language === "ar" ? "اضافة رابط" : "Add Link"}
                   </Button>
                 </Card.Body>
               </Card>
@@ -102,7 +100,7 @@ const AddLinks = ({ setTriggerAction, icons }) => {
             disabled={FormField.length === 0 ? true : false}
             typr="submit"
           >
-            Add Link ..?
+            {language === "ar" ? "اضافة رابط..؟" : "Add Link ..?"}
           </Button>
         }
       >
@@ -112,7 +110,11 @@ const AddLinks = ({ setTriggerAction, icons }) => {
           }}
         >
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Link {selectedItem}</Form.Label>
+            <Form.Label>
+              {language === "ar"
+                ? `${selectedItem} الرابط `
+                : `Link ${selectedItem}`}
+            </Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter Link"
