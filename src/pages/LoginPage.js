@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Spinner } from "react-bootstrap";
 import { Container, Row, Card, Image, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
 import logo from "../assets/dark.png";
 import { auth } from "../Firebase";
@@ -15,12 +14,12 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function LoginPage({ language }) {
   const navigation = useNavigate();
 
-  const { currentUser } = React.useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   // form state
   const [email, setEmail] = useState("");
@@ -47,7 +46,8 @@ function LoginPage({ language }) {
         .then((userCredential) => {
           // Signed in
           setIsLoading(false);
-          navigation("/");
+          const user = userCredential.user;
+          navigation(`/user/profile/${user.uid}`);
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -66,7 +66,8 @@ function LoginPage({ language }) {
       .then((result) => {
         // Signed in
         setIsLoading(false);
-        navigation("/");
+        const user = result.user;
+        navigation(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -82,8 +83,10 @@ function LoginPage({ language }) {
     const provider = new FacebookAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
+        // Signed in
         setIsLoading(false);
-        navigation("/");
+        const user = result.user;
+        navigation(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -109,7 +112,15 @@ function LoginPage({ language }) {
                 roundedCircle
               />
 
-              <h1>{currentUser ? "User logged in" : "Login to Salam"}</h1>
+              <h1>
+                {currentUser
+                  ? language === "ar"
+                    ? "لقد تم الستجيل بالفعل"
+                    : "User already logged in"
+                  : language === "ar"
+                  ? "تسجيل الدخول"
+                  : "Login to Salam"}
+              </h1>
             </div>
 
             <Card.Body className="pb-0">
@@ -122,26 +133,57 @@ function LoginPage({ language }) {
                         width: "100%",
                       }}
                     >
-                      Go to Home
+                      {language === "ar"
+                        ? "العودة إلى الصفحة الرئيسية"
+                        : "Go back to home page"}
                     </Button>
                   </Link>
                 </div>
               ) : (
                 <>
-                  <Form onSubmit={handleSubmit}>
+                  <Form
+                    onSubmit={handleSubmit}
+                    style={
+                      language === "ar"
+                        ? { textAlign: "right" }
+                        : { textAlign: "left" }
+                    }
+                  >
                     <Form.Group controlId="formBasicEmail">
-                      <Form.Label>Email address</Form.Label>
+                      <Form.Label>
+                        {language === "ar"
+                          ? "البريد الإلكتروني"
+                          : "Email address"}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="Enter email"
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                        placeholder={
+                          language === "ar"
+                            ? "البريد الإلكتروني"
+                            : "Email address"
+                        }
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </Form.Group>
 
                     <Form.Group controlId="formBasicPassword">
-                      <Form.Label>Password</Form.Label>
+                      <Form.Label>
+                        {language === "ar" ? "كلمه السر" : "Password"}
+                      </Form.Label>
                       <Form.Control
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
                         type="password"
-                        placeholder="Password"
+                        placeholder={
+                          language === "ar" ? "كلمه السر" : "Password"
+                        }
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </Form.Group>
@@ -153,7 +195,9 @@ function LoginPage({ language }) {
                         <div>
                           {!isLoading ? (
                             <Alert variant="warning">
-                              Please login to continue
+                              {language === "ar"
+                                ? "تسجيل الدخول للمتابعة"
+                                : "Login to continue"}
                             </Alert>
                           ) : (
                             <Spinner animation="border" variant="dark" />
@@ -167,7 +211,7 @@ function LoginPage({ language }) {
                       type="submit"
                       style={{ width: "100%" }}
                     >
-                      Login
+                      {language === "ar" ? "تسجيل الدخول" : "Login"}
                     </Button>
 
                     <Link to="/user/forgot-password" className="text-center">
@@ -177,7 +221,9 @@ function LoginPage({ language }) {
                           color: "#000",
                         }}
                       >
-                        Forgot Password?
+                        {language === "ar"
+                          ? "هل نسيت كلمة المرور؟"
+                          : "Forgot password?"}
                       </p>
                     </Link>
                   </Form>
@@ -204,8 +250,12 @@ function LoginPage({ language }) {
             <hr className="hr" />
             <div className="text-center p-3">
               <Form.Text className="text-muted">
-                If you don't have an account, go{" "}
-                <a href="/user/register">Register</a>
+                {language === "ar"
+                  ? "ليس لديك حساب؟"
+                  : "Don't have an account?"}
+                <Link to="/user/register">
+                  {language === "ar" ? "سجل" : "Sign up"}
+                </Link>
               </Form.Text>
             </div>
           </Card>

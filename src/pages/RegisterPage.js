@@ -22,8 +22,9 @@ import { AuthContext } from "../context/userAuthContext";
 import { useNavigate } from "react-router-dom";
 import { db } from "../Firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { getAdditionalUserInfo } from "firebase/auth";
 
-const RegisterUser = () => {
+const RegisterUser = ({ language }) => {
   const links = {
     Address: "",
     "App Link": "",
@@ -123,7 +124,7 @@ const RegisterUser = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginWithFacebook = () => {
+  const handleLoginWithFacebook = ({ language }) => {
     setError("");
     setIsLoading(true);
 
@@ -134,43 +135,46 @@ const RegisterUser = () => {
         setIsLoading(false);
 
         const user = result.user;
-        console.log(user);
 
-        const userRef = doc(db, "users", user.uid);
-        setDoc(userRef, {
-          activeDevice: false,
-          addLink: true,
-          addProfileImage: false,
-          address: "",
-          backgroundImage: "",
-          bio: "",
-          captureLead: false,
-          color: "",
-          company: "",
-          email: user.email,
-          id: user.uid,
-          image: user.photoURL,
-          imageQR: "",
-          jobTitle: "",
-          language: "ar",
-          logoImage: "",
-          name: user.displayName,
-          password: "",
-          pay: false,
-          scanQR: false,
-          shareProfile: false,
-          token: "",
-        });
-        // add links to links collection
-        const userLinksDoc = doc(db, "links", user.uid);
-        setDoc(userLinksDoc, links);
+        const { isNewUser } = getAdditionalUserInfo(result);
 
-        // add array of links names and arrange to the firebase titles collection
-        const userLinksTitlesDoc = doc(db, "titles", user.uid);
-        setDoc(userLinksTitlesDoc, {
-          list: titles,
-        });
-        // navigate(`/user/profile/${user.uid}`);
+        if (isNewUser) {
+          const userRef = doc(db, "users", user.uid);
+          setDoc(userRef, {
+            activeDevice: false,
+            addLink: true,
+            addProfileImage: false,
+            address: "",
+            backgroundImage: "",
+            bio: "",
+            captureLead: false,
+            color: "white",
+            company: "",
+            email: user.email,
+            id: user.uid,
+            image: user.photoURL,
+            imageQR: "",
+            jobTitle: "",
+            language: "ar",
+            logoImage: "",
+            name: user.displayName,
+            password: "",
+            pay: false,
+            scanQR: false,
+            shareProfile: false,
+            token: "",
+          });
+          // add links to links collection
+          const userLinksDoc = doc(db, "links", user.uid);
+          setDoc(userLinksDoc, links);
+
+          // add array of links names and arrange to the firebase titles collection
+          const userLinksTitlesDoc = doc(db, "titles", user.uid);
+          setDoc(userLinksTitlesDoc, {
+            list: titles,
+          });
+        }
+        navigate(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -188,42 +192,50 @@ const RegisterUser = () => {
       .then((result) => {
         // Signed in
         setIsLoading(false);
+        //check if user have an account
+
         const user = result.user;
-        const userRef = doc(db, "users", user.uid);
-        setDoc(userRef, {
-          activeDevice: false,
-          addLink: true,
-          addProfileImage: false,
-          address: "",
-          backgroundImage: "",
-          bio: "",
-          captureLead: false,
-          color: "",
-          company: "",
-          email: user.email,
-          id: user.uid,
-          image: user.photoURL,
-          imageQR: "",
-          jobTitle: "",
-          language: "ar",
-          logoImage: "",
-          name: user.displayName,
-          password: "",
-          pay: false,
-          scanQR: false,
-          shareProfile: false,
-          token: "",
-        });
 
-        // add links to links collection
-        const userLinksDoc = doc(db, "links", user.uid);
-        setDoc(userLinksDoc, links);
+        const { isNewUser } = getAdditionalUserInfo(result);
 
-        // add array of links names and arrange to the firebase titles collection
-        const userLinksTitlesDoc = doc(db, "titles", user.uid);
-        setDoc(userLinksTitlesDoc, {
-          list: titles,
-        });
+        if (isNewUser) {
+          const userRef = doc(db, "users", user.uid);
+          setDoc(userRef, {
+            activeDevice: false,
+            addLink: true,
+            addProfileImage: false,
+            address: "",
+            backgroundImage: "",
+            bio: "",
+            captureLead: false,
+            color: "white",
+            company: "",
+            email: user.email,
+            id: user.uid,
+            image: user.photoURL,
+            imageQR: "",
+            jobTitle: "",
+            language: "ar",
+            logoImage: "",
+            name: user.displayName,
+            password: "",
+            pay: false,
+            scanQR: false,
+            shareProfile: false,
+            token: "",
+          });
+
+          // add links to links collection
+          const userLinksDoc = doc(db, "links", user.uid);
+          setDoc(userLinksDoc, links);
+
+          // add array of links names and arrange to the firebase titles collection
+          const userLinksTitlesDoc = doc(db, "titles", user.uid);
+          setDoc(userLinksTitlesDoc, {
+            list: titles,
+          });
+        }
+
         navigate(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
@@ -255,43 +267,47 @@ const RegisterUser = () => {
           const user = userCredential.user;
           const id = user.uid;
 
-          //add the user data to the users collection
-          const userRef = doc(db, "users", id);
-          setDoc(userRef, {
-            activeDevice: false,
-            addLink: true,
-            addProfileImage: false,
-            address: "",
-            backgroundImage: "",
-            bio: "",
-            captureLead: false,
-            color: "",
-            company: "",
-            email: email,
-            id: id,
-            image: "",
-            imageQR: "",
-            jobTitle: "",
-            language: "ar",
-            logoImage: "",
-            name: name,
-            password: password,
-            pay: false,
-            scanQR: false,
-            shareProfile: false,
-            token: "",
-          });
+          const { isNewUser } = getAdditionalUserInfo(userCredential);
+
+          if (isNewUser) {
+            //add the user data to the users collection
+            const userRef = doc(db, "users", id);
+            setDoc(userRef, {
+              activeDevice: false,
+              addLink: true,
+              addProfileImage: false,
+              address: "",
+              backgroundImage: "",
+              bio: "",
+              captureLead: false,
+              color: "white",
+              company: "",
+              email: email,
+              id: id,
+              image: "",
+              imageQR: "",
+              jobTitle: "",
+              language: "ar",
+              logoImage: "",
+              name: name,
+              password: password,
+              pay: false,
+              scanQR: false,
+              shareProfile: false,
+              token: "",
+            });
+
+            // add links to links collection
+            const userLinksDoc = doc(db, "links", user.uid);
+            setDoc(userLinksDoc, links);
+
+            // add array of links names and arrange to the firebase titles collection
+            const userLinksTitlesDoc = doc(db, "titles", user.uid);
+            setDoc(userLinksTitlesDoc, {
+              list: titles,
+            });
+          }
           navigate(`/user/profile/${user.uid}`);
-
-          // add links to links collection
-          const userLinksDoc = doc(db, "links", user.uid);
-          setDoc(userLinksDoc, links);
-
-          // add array of links names and arrange to the firebase titles collection
-          const userLinksTitlesDoc = doc(db, "titles", user.uid);
-          setDoc(userLinksTitlesDoc, {
-            list: titles,
-          });
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -319,7 +335,13 @@ const RegisterUser = () => {
               />
 
               <h1 className="p-3">
-                {currentUser ? "User Already Registered" : "Register to Salam"}
+                {currentUser
+                  ? language === "ar"
+                    ? "لقد تم التسجيل بالفعل"
+                    : "User Already Registered"
+                  : language === "ar"
+                  ? "قم بإنشاء حساب"
+                  : "Register to Salam"}
               </h1>
             </div>
 
@@ -333,43 +355,118 @@ const RegisterUser = () => {
                         width: "100%",
                       }}
                     >
-                      Go to Home
+                      {language === "ar"
+                        ? "الذهاب إلى الصفحة الرئيسية"
+                        : "Go to Home"}
                     </Button>
                   </Link>
                 </div>
               ) : (
                 <>
-                  <Form onSubmit={handleSubmit}>
+                  <Form
+                    onSubmit={handleSubmit}
+                    style={
+                      language === "ar"
+                        ? { textAlign: "right" }
+                        : { textAlign: "left" }
+                    }
+                  >
                     <Form.Group controlId="formBasicEmail">
-                      <Form.Label>Email address</Form.Label>
+                      <Form.Label>
+                        {language === "ar"
+                          ? "عنوان البريد الإلكتروني"
+                          : "Email address"}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="Enter email"
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                        placeholder={
+                          language === "ar"
+                            ? " أدخل البريد الإلكتروني"
+                            : "Enter email"
+                        }
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </Form.Group>
 
-                    <Form.Group controlId="formBasicEmail">
-                      <Form.Label>Username</Form.Label>
+                    <Form.Group controlId="formBasicUsername">
+                      <Form.Label
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                      >
+                        {language === "ar" ? "اسم المستخدم" : "Username"}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="Enter username"
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                        placeholder={
+                          language === "ar"
+                            ? "أدخل اسم المستخدم"
+                            : "Enter username"
+                        }
                         onChange={(e) => setName(e.target.value)}
                       />
                     </Form.Group>
 
                     <Form.Group controlId="formBasicPassword">
-                      <Form.Label>Password</Form.Label>
+                      <Form.Label
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                      >
+                        {language === "ar" ? "كلمة المرور" : "Password"}
+                      </Form.Label>
                       <Form.Control
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
                         type="password"
-                        placeholder="Password"
+                        placeholder={
+                          language === "ar"
+                            ? "أدخل كلمة المرور"
+                            : "Enter password"
+                        }
                         onChange={(e) => setPassword(e.target.value)}
                       />
                     </Form.Group>
 
-                    <Form.Group controlId="formBasicPassword">
-                      <Form.Label>Confirm Password</Form.Label>
+                    <Form.Group controlId="formBasicConfirmPassword">
+                      <Form.Label
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                      >
+                        {language === "ar"
+                          ? "تأكيد كلمة المرور"
+                          : "Confirm Password"}
+                      </Form.Label>
                       <Form.Control
                         type="password"
-                        placeholder="Confirm Password"
+                        style={
+                          language === "ar"
+                            ? { textAlign: "right" }
+                            : { textAlign: "left" }
+                        }
+                        placeholder={
+                          language === "ar"
+                            ? "تأكيد كلمة المرور"
+                            : "Confirm Password"
+                        }
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
                     </Form.Group>
@@ -381,7 +478,9 @@ const RegisterUser = () => {
                         <div>
                           {!isLoading ? (
                             <Alert variant="warning">
-                              Register to start using Salam
+                              {language === "ar"
+                                ? "تأكد من تطابق كلمة المرور"
+                                : "Make sure the password matches"}
                             </Alert>
                           ) : (
                             <Spinner animation="border" variant="dark" />
@@ -396,7 +495,7 @@ const RegisterUser = () => {
                       style={{ width: "100%" }}
                       disabled={password !== confirmPassword ? true : false}
                     >
-                      Register
+                      {language === "ar" ? "تسجيل" : "Register"}
                     </Button>
                   </Form>
 
@@ -424,7 +523,12 @@ const RegisterUser = () => {
                 <hr className="hr" />
                 <div className="text-center p-3">
                   <Form.Text className="text-muted">
-                    If you have an account <a href="/user/login">Login</a>
+                    {language === "ar"
+                      ? "لديك حساب؟"
+                      : "Already have an account?"}
+                    <Link to="/user/login">
+                      {language === "ar" ? "تسجيل الدخول" : "Login"}
+                    </Link>
                   </Form.Text>
                 </div>
               </>

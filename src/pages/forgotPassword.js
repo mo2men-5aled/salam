@@ -7,7 +7,7 @@ import logo from "../assets/dark.png";
 import { Link } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ language }) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState();
   const [sent, setSent] = useState(false);
@@ -43,18 +43,46 @@ const ForgotPassword = () => {
                 height="100rem"
                 roundedCircle
               />
-              <h1>{!sent ? "Forgot Password" : "Check Email"}</h1>
+              <h1>
+                {!sent
+                  ? language === "ar"
+                    ? "إعادة تعيين كلمة المرور"
+                    : "Reset Password"
+                  : language === "ar"
+                  ? "تم إرسال البريد الإلكتروني"
+                  : "Email Sent"}
+              </h1>
             </div>
             <hr className="hr" />
 
             <Card.Body>
               {!sent ? (
                 <Form onSubmit={handleSubmit}>
-                  <Form.Group controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
+                  <Form.Group
+                    controlId="formBasicEmail"
+                    style={
+                      language === "ar"
+                        ? { textAlign: "right" }
+                        : { textAlign: "left" }
+                    }
+                  >
+                    <Form.Label>
+                      {language === "ar"
+                        ? "البريد الإلكتروني"
+                        : "Email address"}
+                    </Form.Label>
                     <Form.Control
+                      style={
+                        language === "ar"
+                          ? { textAlign: "right" }
+                          : { textAlign: "left" }
+                      }
                       type="email"
-                      placeholder="Enter email"
+                      placeholder={
+                        language === "ar"
+                          ? "البريد الإلكتروني"
+                          : "Email address"
+                      }
                       onChange={(e) => {
                         setEmail(e.target.value);
                       }}
@@ -66,8 +94,9 @@ const ForgotPassword = () => {
                       <Alert variant="danger">{error}</Alert>
                     ) : (
                       <Alert variant="warning">
-                        We will send you an email with a link to reset your
-                        password.
+                        {language === "ar"
+                          ? "سيتم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني"
+                          : "A password reset link will be sent to your email"}
                       </Alert>
                     )}
                   </div>
@@ -78,21 +107,24 @@ const ForgotPassword = () => {
                       width: "100%",
                     }}
                   >
-                    Submit
+                    {language === "ar" ? "إرسال" : "Send"}
                   </Button>
                   <hr className="hr" />
                   <Link to="/user/login">
                     <Button variant="link" style={{ width: "100%" }}>
-                      Back to Login
+                      {language === "ar"
+                        ? "لديك حساب؟ تسجيل الدخول"
+                        : "Have an account? Login"}
                     </Button>
                   </Link>
                 </Form>
               ) : (
                 <div className="text-center">
-                  <p>
-                    We have sent you an email with a link to reset your
-                    password. If you don't see it, check your spam folder.
-                  </p>
+                  <Alert variant="success">
+                    {language === "ar"
+                      ? "تم إرسال البريد الإلكتروني بنجاح"
+                      : "Email sent successfully"}
+                  </Alert>
                   <Button
                     variant="dark"
                     href="/user/login"
@@ -100,7 +132,7 @@ const ForgotPassword = () => {
                       width: "100%",
                     }}
                   >
-                    Back to Login
+                    {language === "ar" ? "تسجيل الدخول" : "Login"}
                   </Button>
                 </div>
               )}
