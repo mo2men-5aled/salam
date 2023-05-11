@@ -131,7 +131,7 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
                           navigate("/user/profile/" + user.uid);
                         }}
                       >
-                        {user.displayName ? user.displayName : name}
+                        {name}
                       </Navbar.Text>
 
                       <Button
