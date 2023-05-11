@@ -29,10 +29,16 @@ function AppWrapper() {
       />
       <Routes>
         {/* Routes without navbar */}
-        <Route path="/user/login" element={<LoginPage />} />
-        <Route path="/user/register" element={<RegisterUser />} />
+        <Route path="/user/login" element={<LoginPage language={language} />} />
+        <Route
+          path="/user/register"
+          element={<RegisterUser language={language} />}
+        />
         <Route path="/no-user" element={<NoUser />} />
-        <Route path="/user/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/user/forgot-password"
+          element={<ForgotPassword language={language} />}
+        />
 
         {/* Routes with the navbar */}
         <Route
