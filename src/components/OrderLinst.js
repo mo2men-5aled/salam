@@ -127,6 +127,7 @@ const SortableItem = SortableElement(
 
 const SortableList = SortableContainer(
   ({
+    num,
     items,
     links,
     onDelete,
@@ -143,17 +144,18 @@ const SortableList = SortableContainer(
     setSelectedItem,
     language,
   }) => {
+    console.log(num);
     return (
-      <ul
-        style={{
-          listStyle: "none",
-          padding: 0,
-        }}
-      >
-        {!Object.values(links).length > 0 ? (
-          (console.log(Object.values(links).length > 0),
-          items.map((item, index) => {
+      <>
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+          }}
+        >
+          {items.map((item, index) => {
             if (links[item]) {
+              num = num + 1;
               return (
                 <SortableItem
                   language={language}
@@ -178,18 +180,14 @@ const SortableList = SortableContainer(
             } else {
               return null;
             }
-          }))
-        ) : (
-          <div
-            className="text-center"
-            style={{
-              fontSize: "2rem",
-            }}
-          >
+          })}
+        </ul>
+        {num === 0 && (
+          <div className="text-center" style={{ fontSize: "2rem" }}>
             {language === "ar" ? "لا يوجد روابط" : "No Links"}
           </div>
         )}
-      </ul>
+      </>
     );
   }
 );
@@ -201,6 +199,7 @@ const MyComponent = ({
   setIcons,
   language,
 }) => {
+  var num = 0;
   const { id } = useParams();
 
   const [links, setLink] = useState("");
@@ -246,12 +245,13 @@ const MyComponent = ({
     });
   };
 
-  // Update function
+  // Delete function
   const handleDelete = () => {
     const ref = doc(db, "links", id);
     updateDoc(ref, {
       [selectedItem]: "",
     }).then(
+      (num = num - 1),
       setFormField(""),
       handleDeleteModalClose(),
       setSelectedItem(""),
@@ -259,7 +259,7 @@ const MyComponent = ({
     );
   };
 
-  // Delete function
+  // Update function
   const handleUpdate = () => {
     const ref = doc(db, "links", id);
     updateDoc(ref, {
@@ -290,6 +290,7 @@ const MyComponent = ({
   return (
     <>
       <SortableList
+        num={num}
         items={icons}
         links={links}
         onSortEnd={onSortEnd}
