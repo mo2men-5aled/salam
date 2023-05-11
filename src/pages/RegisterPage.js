@@ -134,6 +134,8 @@ const RegisterUser = () => {
         setIsLoading(false);
 
         const user = result.user;
+        console.log(user);
+
         const userRef = doc(db, "users", user.uid);
         setDoc(userRef, {
           activeDevice: false,
@@ -147,7 +149,7 @@ const RegisterUser = () => {
           company: "",
           email: user.email,
           id: user.uid,
-          image: "",
+          image: user.photoURL,
           imageQR: "",
           jobTitle: "",
           language: "ar",
@@ -168,7 +170,7 @@ const RegisterUser = () => {
         setDoc(userLinksTitlesDoc, {
           list: titles,
         });
-        navigate(`/user/profile/${user.uid}`);
+        // navigate(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -200,7 +202,7 @@ const RegisterUser = () => {
           company: "",
           email: user.email,
           id: user.uid,
-          image: "",
+          image: user.photoURL,
           imageQR: "",
           jobTitle: "",
           language: "ar",
