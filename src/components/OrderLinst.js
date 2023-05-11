@@ -150,33 +150,45 @@ const SortableList = SortableContainer(
           padding: 0,
         }}
       >
-        {items.map((item, index) => {
-          if (links[item]) {
-            return (
-              <SortableItem
-                language={language}
-                key={`item-${item}`}
-                index={index}
-                value={links[item]}
-                item={item}
-                handleShow={handleShow}
-                onDelete={onDelete}
-                onUpdate={onUpdate}
-                UpdateModalshow={UpdateModalshow} //show
-                handleUpdateModalClose={handleUpdateModalClose} //handleClose
-                handleUpdateModalShow={handleUpdateModalShow} //handleShow
-                DeleteModalshow={DeleteModalshow}
-                handleDeleteModalClose={handleDeleteModalClose}
-                handleDeleteModalShow={handleDeleteModalShow}
-                FormField={FormField}
-                setFormField={setFormField}
-                setSelectedItem={setSelectedItem}
-              />
-            );
-          } else {
-            return null;
-          }
-        })}
+        {!Object.values(links).length > 0 ? (
+          (console.log(Object.values(links).length > 0),
+          items.map((item, index) => {
+            if (links[item]) {
+              return (
+                <SortableItem
+                  language={language}
+                  key={`item-${item}`}
+                  index={index}
+                  value={links[item]}
+                  item={item}
+                  handleShow={handleShow}
+                  onDelete={onDelete}
+                  onUpdate={onUpdate}
+                  UpdateModalshow={UpdateModalshow} //show
+                  handleUpdateModalClose={handleUpdateModalClose} //handleClose
+                  handleUpdateModalShow={handleUpdateModalShow} //handleShow
+                  DeleteModalshow={DeleteModalshow}
+                  handleDeleteModalClose={handleDeleteModalClose}
+                  handleDeleteModalShow={handleDeleteModalShow}
+                  FormField={FormField}
+                  setFormField={setFormField}
+                  setSelectedItem={setSelectedItem}
+                />
+              );
+            } else {
+              return null;
+            }
+          }))
+        ) : (
+          <div
+            className="text-center"
+            style={{
+              fontSize: "2rem",
+            }}
+          >
+            {language === "ar" ? "لا يوجد روابط" : "No Links"}
+          </div>
+        )}
       </ul>
     );
   }
