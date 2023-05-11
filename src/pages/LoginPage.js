@@ -15,7 +15,11 @@ import {
   FacebookAuthProvider,
 } from "firebase/auth";
 
+import { useNavigate } from "react-router-dom";
+
 function LoginPage({ language }) {
+  const navigation = useNavigate();
+
   const { currentUser } = React.useContext(AuthContext);
 
   // form state
@@ -43,7 +47,7 @@ function LoginPage({ language }) {
         .then((userCredential) => {
           // Signed in
           setIsLoading(false);
-          window.location.href = "/";
+          navigation("/");
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -62,7 +66,7 @@ function LoginPage({ language }) {
       .then((result) => {
         // Signed in
         setIsLoading(false);
-        window.location.href = "/";
+        navigation("/");
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -78,9 +82,8 @@ function LoginPage({ language }) {
     const provider = new FacebookAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
-        // Signed in
         setIsLoading(false);
-        window.location.href = "/";
+        navigation("/");
       })
       .catch((error) => {
         const errorMessage = error.message;
