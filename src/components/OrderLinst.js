@@ -246,7 +246,8 @@ const MyComponent = ({
   };
 
   // Delete function
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.preventDefault();
     const ref = doc(db, "links", id);
     updateDoc(ref, {
       [selectedItem]: "",
@@ -260,7 +261,8 @@ const MyComponent = ({
   };
 
   // Update function
-  const handleUpdate = () => {
+  const handleUpdate = (e) => {
+    e.preventDefault();
     const ref = doc(db, "links", id);
     updateDoc(ref, {
       [selectedItem]: FormField,
@@ -316,17 +318,12 @@ const MyComponent = ({
           </Button>
         }
         FooterChildren={
-          <Button
-            variant="dark"
-            onClick={() => {
-              handleUpdate(selectedItem);
-            }}
-          >
+          <Button variant="dark" type="submit" onClick={handleUpdate}>
             {language === "ar" ? "تعديل" : "Update"}
           </Button>
         }
       >
-        <Form>
+        <Form onSubmit={handleUpdate}>
           <Form.Group
             className="mb-3"
             controlId="formBasicEmail"
@@ -369,12 +366,7 @@ const MyComponent = ({
         handleClose={handleDeleteModalClose}
         header={`Update ${selectedItem}`}
         FooterChildren={
-          <Button
-            variant="dark"
-            onClick={() => {
-              handleDelete(selectedItem);
-            }}
-          >
+          <Button variant="dark" onClick={handleDelete}>
             {language === "ar" ? "حذف" : "Delete"}
           </Button>
         }

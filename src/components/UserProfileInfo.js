@@ -415,7 +415,12 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
                   ? { textAlign: "right" }
                   : { textAlign: "left" }
               }
-              accept="image/*"
+              //make it accept only jpg nad jpeg
+              accept={
+                folder === "userImage"
+                  ? "image/jpeg, image/jpg"
+                  : "image/jpeg, image/jpg, image/png"
+              }
               type="file"
               onChange={handleFileSelect}
             />
@@ -428,8 +433,8 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
                 {!uploading ? (
                   <Alert variant="warning">
                     {language === "ar"
-                      ? "برجاء تحميل صورة واحده"
-                      : "Please Upload an image"}
+                      ? "JPG, JPEG يسمح فقط لصورة الملف الشخصي ان تكون بامتداد "
+                      : "JPG, JPEG image only allowed for profile image"}
                   </Alert>
                 ) : (
                   <Spinner animation="border" variant="dark" />
