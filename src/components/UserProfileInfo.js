@@ -25,6 +25,9 @@ import { useNavigate } from "react-router-dom";
 
 import { getDownloadURL } from "firebase/storage";
 
+import QRCode from "qrcode.react";
+import CopyInput from "./copy_Inputfield";
+
 const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -42,6 +45,10 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const handleClosePhotoModal = () => setShowPhotoModal(false);
   const handleShowPhotoModal = () => setShowPhotoModal(true);
+
+  const [showShareModal, setShowShareModal] = useState(false);
+  const handleCloseShareModal = () => setShowShareModal(false);
+  const handleShowShareModal = () => setShowShareModal(true);
 
   const [showDataModal, setDataModal] = useState(false);
   const handleCloseDataModal = () => setDataModal(false);
@@ -94,6 +101,19 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
           } else if (folder === "backgroundImage") {
             updateDoc(doc(db, "users", id), {
               backgroundImage: downloadURL,
+            })
+              .then(() => {
+                setUploading(false);
+                setTriggerAction(true);
+                handleClosePhotoModal();
+              })
+              .catch((error) => {
+                setError(error);
+                setUploading(false);
+              });
+          } else if (folder === "QRImage") {
+            updateDoc(doc(db, "users", id), {
+              imageQR: downloadURL,
             })
               .then(() => {
                 setUploading(false);
@@ -352,6 +372,16 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
                 >
                   {language === "ar" ? "عرض البطاقة" : "Preview Card"}
                 </Button>
+                <Button
+                  variant="dark"
+                  style={{
+                    margin: "1rem 0 0 1rem",
+                  }}
+                  size="sm"
+                  onClick={handleShowShareModal}
+                >
+                  {language === "ar" ? "شارك" : "Share"}
+                </Button>
               </>
             </div>
           </Col>
@@ -395,6 +425,9 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
             </option>
             <option value="logoImage">
               {language === "ar" ? "اللوجو" : "Logo Image"}
+            </option>
+            <option value="QRImage">
+              {language === "ar" ? "صورة الكيو ار كود" : "QRCode Image"}
             </option>
           </Form.Select>
           <Form.Group
@@ -555,6 +588,60 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
             )}
           </div>
         </Form>
+      </CustomModal>
+
+      <CustomModal
+        show={showShareModal}
+        handleClose={handleCloseShareModal}
+        header={language === "ar" ? "شارك موقعك" : "Share Your website"}
+        FooterChildren={
+          <Button
+            variant="dark"
+            type="submit"
+            onClick={() => {
+              updateUserData();
+            }}
+          >
+            {language === "ar" ? "حفظ" : "Save"}
+          </Button>
+        }
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: "1rem 0 1rem 0",
+            }}
+          >
+            <QRCode
+              value={`https://salamofficial.me/${user.id}`}
+              size={200}
+              bgColor={"#ffffff"}
+              fgColor={"#000000"}
+              level={"L"}
+              includeMargin={false}
+              renderAs={"svg"}
+              imageSettings={{
+                src: `${user.imageQR === "" ? dark_image : user.imageQR}`,
+                x: null,
+                y: null,
+                height: 30,
+                width: 30,
+                excavate: true,
+              }}
+            />
+          </div>
+          <CopyInput link={`https://salamofficial.me/${user.id}`} />
+        </div>
       </CustomModal>
     </div>
   );

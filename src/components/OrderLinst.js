@@ -144,7 +144,6 @@ const SortableList = SortableContainer(
     setSelectedItem,
     language,
   }) => {
-    console.log(num);
     return (
       <>
         <ul
