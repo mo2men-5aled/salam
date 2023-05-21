@@ -593,16 +593,10 @@ const UserProfileInfo = ({ triggerAction, setTriggerAction, language }) => {
       <CustomModal
         show={showShareModal}
         handleClose={handleCloseShareModal}
-        header={language === "ar" ? "شارك موقعك" : "Share Your website"}
+        header={language === "ar" ? "شارك صفحتك" : "Share Your website"}
         FooterChildren={
-          <Button
-            variant="dark"
-            type="submit"
-            onClick={() => {
-              updateUserData();
-            }}
-          >
-            {language === "ar" ? "حفظ" : "Save"}
+          <Button variant="dark" type="submit" onClick={handleCloseShareModal}>
+            {language === "ar" ? "الغاء" : "Cancel"}
           </Button>
         }
       >
