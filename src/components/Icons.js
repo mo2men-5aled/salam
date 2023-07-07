@@ -4,35 +4,39 @@ import Icon_Codes from "./Icon_Links";
 import EmbeddedVideo from "./embedded_video";
 import return_Links from "./links";
 
-import property from "./Get_property_func";
 import { Spinner } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
-import { doc, getDoc, setDoc, collection } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 
 const Icons = (props) => {
   const { id } = useParams();
   const date = new Date().toDateString();
-  const [link, setLink] = useState("");
-  const [icons, setIcon] = useState();
+  const [links, setLinks] = useState("");
+
+  const icons = Object.keys(Icon_Codes);
 
   useEffect(() => {
     const fetchLinkAndIcon = async () => {
-      const linkDocRef = doc(db, "links", `${id}`);
-      const linkDocSnap = await getDoc(linkDocRef);
-      if (linkDocSnap.exists()) {
-        setLink(linkDocSnap.data());
-      }
+      // Construct the query to get documents in the nested collection with the user ID
+      const linkCollectionRef = collection(db, "link");
+      const nestedCollectionRef = collection(linkCollectionRef, id, "order");
 
-      const iconDocRef = doc(db, "titles", `${id}`);
-      const iconDocSnap = await getDoc(iconDocRef);
-      setIcon(iconDocSnap.data());
+      // Execute the query
+      const querySnapshot = await getDocs(nestedCollectionRef);
+
+      // Get the data from the documents sorted
+      setLinks(
+        querySnapshot.docs
+          .map((doc) => doc.data())
+          .sort((a, b) => a.number - b.number)
+      );
     };
 
     fetchLinkAndIcon();
   }, [id]);
 
-  if (!icons) {
+  if (!links) {
     return (
       <div>
         <Spinner animation="border" variant="dark" />
@@ -40,9 +44,19 @@ const Icons = (props) => {
     );
   }
 
-  var evideo = property(link, "Embedded Video").value;
+  const VideosLinks = [];
+  var evideo = links.map((link) => {
+    if (link.type === "Embedded Video") {
+      VideosLinks.push(link.link);
+    }
+  });
 
-  var hText = property(link, "Header Text").value;
+  const HeaderText = [];
+  var hText = links.map((link) => {
+    if (link.type === "Header Text") {
+      HeaderText.push(link.link);
+    }
+  });
 
   function Check_HTTP(icon, link) {
     if (link) {
@@ -58,11 +72,17 @@ const Icons = (props) => {
     }
   }
 
-  const index_of_EV = icons.list.indexOf("Embedded Video");
-  icons.list.splice(index_of_EV, 1);
+  const index_of_EV = links.indexOf(
+    links.find((link) => link.type === "Embedded Video")
+  );
 
-  const index_of_HT = icons.list.indexOf("Header Text");
-  icons.list.splice(index_of_HT, 1);
+  links.splice(index_of_EV, 2);
+
+  const index_of_HT = links.indexOf(
+    links.find((link) => link.type === "Header Text")
+  );
+
+  links.splice(index_of_HT, 2);
 
   const handleTap = async (icon) => {
     const tapsRef = collection(doc(db, "users", id), "taps");
@@ -72,49 +92,52 @@ const Icons = (props) => {
 
   return (
     <div>
-      <h1 className="text-center">{hText}</h1>
+      {hText &&
+        HeaderText.map((text) => <h1 className="text-center">{text}</h1>)}
       <div className="container" style={{ marginBottom: "20px" }}>
         <div className="row g-x5">
-          {icons.list.map((icon) => {
-            if (property(link, icon).value !== "") {
-              return (
-                <div
-                  className="col-4"
-                  key={Math.random()}
-                  onClick={() => {
-                    handleTap(icon);
-                  }}
-                >
-                  <div className="profile-card-social__item-white">
-                    <a
-                      className="icon-font"
-                      href={Check_HTTP(
-                        icon,
-                        return_Links(icon, property(link, icon).value)
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer external"
-                    >
-                      <img
-                        src={Icon_Codes[icon]}
-                        alt="icon"
-                        className="img-icon"
-                      />
-                    </a>
-                  </div>
-                  <h6
-                    className="text-center"
-                    style={{ fontFamily: "'Quicksand', sans-serif" }}
+          {links.map((link) => {
+            console.log(
+              Check_HTTP(link.type, return_Links(link.type, link.link))
+            );
+            return (
+              <div
+                className="col-4"
+                key={Math.random()}
+                onClick={() => {
+                  handleTap(link);
+                }}
+              >
+                <div className="profile-card-social__item-white">
+                  <a
+                    className="icon-font"
+                    href={Check_HTTP(
+                      link.type,
+                      return_Links(link.type, link.link)
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer external"
                   >
-                    {icon}
-                  </h6>
+                    <img
+                      src={Icon_Codes[link.type]}
+                      alt="icon"
+                      className="img-icon"
+                    />
+                  </a>
                 </div>
-              );
-            } else {
-              return null;
-            }
+                <h6
+                  className="text-center"
+                  style={{ fontFamily: "'Quicksand', sans-serif" }}
+                >
+                  {link.type}
+                </h6>
+              </div>
+            );
           })}
-          <EmbeddedVideo url={evideo} />
+          {evideo &&
+            VideosLinks.map((link) => {
+              return <EmbeddedVideo url={link} />;
+            })}
         </div>
       </div>
     </div>

@@ -1,32 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import MyComponent from "./OrderLinst";
 import AddLinks from "./AddLinks";
-import { useParams } from "react-router-dom";
-import { db } from "../Firebase";
-import { doc, getDoc } from "firebase/firestore";
 
 function ControlledTabs({ triggerAction, setTriggerAction, language }) {
-  const { id } = useParams();
-  const [icons, setIcons] = useState([]);
   const [key, setKey] = useState("home");
 
-  useEffect(
-    () => {
-      const ref1 = doc(db, "titles", id);
-      getDoc(ref1)
-        .then((icon) => {
-          setIcons(icon.data().list);
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
-    },
-
-    [id, triggerAction, setTriggerAction],
-    [icons]
-  );
   return (
     <Tabs
       id="controlled-tab-example"
@@ -39,8 +19,6 @@ function ControlledTabs({ triggerAction, setTriggerAction, language }) {
           language={language}
           triggerAction={triggerAction}
           setTriggerAction={setTriggerAction}
-          icons={icons}
-          setIcons={setIcons}
         />
       </Tab>
       <Tab
@@ -49,7 +27,6 @@ function ControlledTabs({ triggerAction, setTriggerAction, language }) {
       >
         <AddLinks
           language={language}
-          icons={icons}
           triggerAction={triggerAction}
           setTriggerAction={setTriggerAction}
         />

@@ -1,15 +1,15 @@
 import React from "react";
 
-const EmbeddedVideo = (props) => {
+const EmbeddedVideo = ({ url }) => {
   var vid_id;
-  if (props.url.includes("v=")) {
-    vid_id = props.url.split("v=")[1];
-  } else if (props.url.includes("embed")) {
-    vid_id = props.url.split("/")[4];
+  if (url.includes("v=")) {
+    vid_id = url.split("v=")[1];
+  } else if (url.includes("embed")) {
+    vid_id = url.split("/")[4];
   } else {
-    vid_id = props.url.split("/")[3];
+    vid_id = url.split("/")[3];
   }
-  if (props.url === "" || props.url === undefined) {
+  if (url === "" || url === undefined) {
     return null;
   } else {
     return (
