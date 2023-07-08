@@ -9,12 +9,10 @@ import { useParams } from "react-router-dom";
 
 import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 
-const Icons = (props) => {
+const Icons = () => {
   const { id } = useParams();
   const date = new Date().toDateString();
   const [links, setLinks] = useState("");
-
-  const icons = Object.keys(Icon_Codes);
 
   useEffect(() => {
     const fetchLinkAndIcon = async () => {
@@ -76,13 +74,13 @@ const Icons = (props) => {
     links.find((link) => link.type === "Embedded Video")
   );
 
-  links.splice(index_of_EV, 2);
+  links.splice(index_of_EV, VideosLinks.length);
 
   const index_of_HT = links.indexOf(
     links.find((link) => link.type === "Header Text")
   );
 
-  links.splice(index_of_HT, 2);
+  links.splice(index_of_HT, HeaderText.length);
 
   const handleTap = async (icon) => {
     const tapsRef = collection(doc(db, "users", id), "taps");
