@@ -27,7 +27,6 @@ function Get_bg_Color(Color) {
 
 const Show = () => {
   const [user, setUser] = useState({});
-  const [link, setLink] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [redirect, setRedirect] = useState(false);
 
@@ -35,8 +34,6 @@ const Show = () => {
 
   useEffect(() => {
     const ref = doc(db, "users", id);
-    const ref1 = doc(db, "links", id);
-
     getDoc(ref)
       .then((doc) => {
         if (doc.exists()) {
@@ -44,20 +41,6 @@ const Show = () => {
           setIsLoading(false);
         } else {
           setRedirect(true); // Redirect to NOData
-        }
-      })
-      .catch((error) => {
-        console.log("Error getting document:", error);
-      });
-
-    getDoc(ref1)
-      .then((doc) => {
-        if (doc.exists()) {
-          setLink(doc.data());
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
-          console.log("No such document!");
         }
       })
       .catch((error) => {
@@ -102,7 +85,7 @@ const Show = () => {
           <h5>{user.company}</h5>
           <h5 style={{ fontFamily: "'Quicksand', sans-serif" }}>{user.bio}</h5>
 
-          <PopUpForm user={user} data={link} />
+          <PopUpForm user={user} />
           <Icons user={user} />
         </div>
       </div>

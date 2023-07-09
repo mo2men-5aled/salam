@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -21,6 +21,29 @@ import {
 } from "firebase/firestore";
 
 function PopUpForm(props) {
+  const [links, setLinks] = useState("");
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchLinkAndIcon = async () => {
+      // Construct the query to get documents in the nested collection with the user ID
+      const linkCollectionRef = collection(db, "link");
+      const nestedCollectionRef = collection(linkCollectionRef, id, "order");
+
+      // Execute the query
+      const querySnapshot = await getDocs(nestedCollectionRef);
+
+      // Get the data from the documents sorted
+      setLinks(
+        querySnapshot.docs
+          .map((doc) => doc.data())
+          .sort((a, b) => a.number - b.number)
+      );
+    };
+
+    fetchLinkAndIcon();
+  }, [id]);
+
   const date = new Date().toDateString();
   const date_time = new Date().toLocaleTimeString();
 
@@ -67,8 +90,6 @@ function PopUpForm(props) {
     setUser_id(querySnapshot.docs[0].id);
   };
 
-  const { id } = useParams();
-
   var Users_Emails = [];
 
   getDocs(Data_Share).then((querySnapshot) => {
@@ -100,13 +121,14 @@ function PopUpForm(props) {
     }
   };
 
+  console.log(props.user.image);
   return (
     <div className="container dot">
       {/* Save Contacts button */}
       <button
         id="bttn"
         onClick={() => {
-          Create_Vcard(props.data, props.user);
+          Create_Vcard(links, props.user);
           handleShow();
         }}
         className="btn btn-lg text-center"
@@ -131,11 +153,7 @@ function PopUpForm(props) {
         centered
       >
         <div className="img_div">
-          <UserImage
-            User={props.user.image}
-            classname="form_image"
-            profile="false"
-          />
+          <UserImage User={props.user} classname="form_image" profile="false" />
         </div>
 
         <div className="close_btn">

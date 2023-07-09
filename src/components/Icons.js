@@ -95,9 +95,6 @@ const Icons = () => {
       <div className="container" style={{ marginBottom: "20px" }}>
         <div className="row g-x5">
           {links.map((link) => {
-            console.log(
-              Check_HTTP(link.type, return_Links(link.type, link.link))
-            );
             return (
               <div
                 className="col-4"
