@@ -3,17 +3,6 @@ import FileSaver from "file-saver";
 import axios from "axios";
 import { Buffer } from "buffer";
 
-function property(object, prop) {
-  return {
-    get value() {
-      return object[prop];
-    },
-    set value(val) {
-      object[prop] = val;
-    },
-  };
-}
-
 const Create_Vcard = async (links, user) => {
   const myVCard = new VCard();
 
@@ -31,15 +20,19 @@ const Create_Vcard = async (links, user) => {
 
   myVCard
     .addName(last_name, first_name)
-    // .addAddress(address)
-    // .addPhoneNumber(number)
     .addCompany(user.company)
     .addJobtitle(user.jobTitle);
 
-  // .addEmail(mail);
-
-  links.map((link) => {
-    myVCard.addURL(link.link);
+  links.forEach((link) => {
+    if (link.type === "Email") {
+      myVCard.addEmail(link.link);
+    } else if (link.type === "Call") {
+      myVCard.addPhoneNumber(link.link);
+    } else if (link.type === "Address") {
+      myVCard.addAddress(link.link);
+    } else {
+      myVCard.addURL(link.link);
+    }
   });
 
   //   save the vcard
