@@ -90,8 +90,16 @@ const Icons = () => {
 
   return (
     <div>
-      {hText &&
-        HeaderText.map((text) => <h1 className="text-center">{text}</h1>)}
+      <div
+        style={{
+          paddingBottom: "3rem",
+        }}
+      >
+        {hText &&
+          HeaderText.map((text) => {
+            return <h1 className="text-center">{text}</h1>;
+          })}
+      </div>
       <div className="container" style={{ marginBottom: "20px" }}>
         <div className="row g-x5">
           {links.map((link) => {
