@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 
 import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 
-const Icons = () => {
+const Icons = ({ triggerAction, setTriggerAction }) => {
   const { id } = useParams();
   const date = new Date().toDateString();
   const [links, setLinks] = useState("");
@@ -31,8 +31,12 @@ const Icons = () => {
       );
     };
 
-    fetchLinkAndIcon();
-  }, [id]);
+    if (!triggerAction) {
+      fetchLinkAndIcon();
+    }
+
+    if (triggerAction !== false) setTriggerAction(false);
+  }, [id, triggerAction, setTriggerAction]);
 
   if (!links) {
     return (

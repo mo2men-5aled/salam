@@ -20,7 +20,7 @@ import {
   addDoc,
 } from "firebase/firestore";
 
-function PopUpForm(props) {
+function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
   const [links, setLinks] = useState("");
   const { id } = useParams();
 
@@ -41,8 +41,12 @@ function PopUpForm(props) {
       );
     };
 
-    fetchLinkAndIcon();
-  }, [id]);
+    if (!triggerAction) {
+      fetchLinkAndIcon();
+    }
+
+    if (triggerAction !== false) setTriggerAction(false);
+  }, [id, triggerAction, setTriggerAction]);
 
   const date = new Date().toDateString();
   const date_time = new Date().toLocaleTimeString();
@@ -105,7 +109,7 @@ function PopUpForm(props) {
       if (emailFound) {
         handleClose();
 
-        setDoc(doc(db, "users", props.user.id, "connectionData", user_id), {
+        setDoc(doc(db, "users", user.id, "connectionData", user_id), {
           ...form_Values,
         });
 
@@ -114,33 +118,33 @@ function PopUpForm(props) {
         });
       } else {
         handleClose();
-        addDoc(collection(db, "users", props.user.id, "connectionData"), {
+        addDoc(collection(db, "users", user.id, "connectionData"), {
           ...form_Values,
         });
       }
     }
   };
 
-  console.log(props.user.image);
+  console.log(user.image);
   return (
     <div className="container dot">
       {/* Save Contacts button */}
       <button
         id="bttn"
         onClick={() => {
-          Create_Vcard(links, props.user);
+          Create_Vcard(links, user);
           handleShow();
         }}
         className="btn btn-lg text-center"
         style={{
           width: "100%",
           height: "70px",
-          background: `${Get_Color(props.user.color)}`,
+          background: `${Get_Color(user.color)}`,
           color: "white",
           fontWeight: "bold",
         }}
       >
-        {props.user.language === "ar" ? "حفظ جهة الاتصال" : "Save Contact"}
+        {language === "ar" ? "حفظ جهة الاتصال" : "Save Contact"}
       </button>
 
       {/* Model form pops up */}
@@ -153,7 +157,7 @@ function PopUpForm(props) {
         centered
       >
         <div className="img_div">
-          <UserImage User={props.user} classname="form_image" profile="false" />
+          <UserImage User={user} classname="form_image" profile="false" />
         </div>
 
         <div className="close_btn">
@@ -166,26 +170,18 @@ function PopUpForm(props) {
         </div>
 
         <h4 className="text-center">
-          {props.user.language === "ar"
+          {language === "ar"
             ? " شارك معلوماتك مع "
             : "Share your info back with"}
-          <p>
-            {props.user.language === "ar" ? (
-              <>{props.user.name}</>
-            ) : (
-              <>{props.user.name}</>
-            )}
-          </p>
+          <p>{language === "ar" ? <>{user.name}</> : <>{user.name}</>}</p>
         </h4>
 
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               type="email"
-              placeholder={
-                props.user.language === "ar" ? "البريد الالكتروني" : "Email"
-              }
+              placeholder={language === "ar" ? "البريد الالكتروني" : "Email"}
               name="email"
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -194,9 +190,9 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               type="text"
-              placeholder={props.user.language === "ar" ? "الاسم" : "Name"}
+              placeholder={language === "ar" ? "الاسم" : "Name"}
               name="name"
               onChange={(e) => {
                 setName(e.target.value);
@@ -219,11 +215,9 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               type="number"
-              placeholder={
-                props.user.language === "ar" ? "رقم الهاتف" : "Phone Number"
-              }
+              placeholder={language === "ar" ? "رقم الهاتف" : "Phone Number"}
               name="number"
               onChange={(e) => {
                 setPhone(e.target.value);
@@ -236,12 +230,10 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               type="text"
               name="job title"
-              placeholder={
-                props.user.language === "ar" ? "المسمى الوظيفي" : "Job Title"
-              }
+              placeholder={language === "ar" ? "المسمى الوظيفي" : "Job Title"}
               onChange={(e) => {
                 setJob(e.target.value);
 
@@ -252,19 +244,19 @@ function PopUpForm(props) {
             />
 
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               type="text"
               name="company"
-              placeholder={props.user.language === "ar" ? "الشركة" : "Company"}
+              placeholder={language === "ar" ? "الشركة" : "Company"}
               onChange={(e) => {
                 setCompany(e.target.value);
               }}
             />
 
             <Form.Control
-              dir={props.user.language === "ar" ? "rtl" : "ltr"}
+              dir={language === "ar" ? "rtl" : "ltr"}
               as="textarea"
-              placeholder={props.user.language === "ar" ? "ملاحظات" : "Notes"}
+              placeholder={language === "ar" ? "ملاحظات" : "Notes"}
               onChange={(e) => {
                 setNotes(e.target.value);
               }}
@@ -277,15 +269,15 @@ function PopUpForm(props) {
                 width: "100%",
                 borderRadius: "30px",
                 height: "50px",
-                backgroundColor: `${Get_Color(props.user.color)}`,
+                backgroundColor: `${Get_Color(user.color)}`,
                 color: "white",
                 fontWeight: "bold",
               }}
             >
-              {props.user.language === "ar" ? "سَلِم" : "Connect"}
+              {language === "ar" ? "سَلِم" : "Connect"}
             </Button>
             <p className="quete">
-              {props.user.language === "ar"
+              {language === "ar"
                 ? "سلام لا تبيع او تشارك بياناتك"
                 : "Salam does not sell or share your data"}
             </p>

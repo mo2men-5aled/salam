@@ -63,7 +63,16 @@ function AppWrapper() {
             />
           }
         />
-        <Route path="/:id" element={<Show />} />
+        <Route
+          path="/:id"
+          element={
+            <Show
+              language={language}
+              triggerAction={triggerAction}
+              setTriggerAction={setTriggerAction}
+            />
+          }
+        />
         <Route path="/articles" element={<ArticlesPage />} />
         <Route path="/article/:id" element={<ViewArticle />} />
         <Route path="/admin/:id" element={<AdminPage />} />

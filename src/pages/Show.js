@@ -25,7 +25,7 @@ function Get_bg_Color(Color) {
   }
 }
 
-const Show = () => {
+const Show = ({ language, triggerAction, setTriggerAction }) => {
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [redirect, setRedirect] = useState(false);
@@ -71,7 +71,7 @@ const Show = () => {
   return (
     // Profile_Image
     <>
-      <MetaDeco bgcolor={Get_bg_Color(user.color)} language={user.language} />
+      <MetaDeco bgcolor={Get_bg_Color(user.color)} language={language} />
 
       <div>
         <BgImage User={user} />
@@ -85,8 +85,16 @@ const Show = () => {
           <h5>{user.company}</h5>
           <h5 style={{ fontFamily: "'Quicksand', sans-serif" }}>{user.bio}</h5>
 
-          <PopUpForm user={user} />
-          <Icons user={user} />
+          <PopUpForm
+            user={user}
+            triggerAction={triggerAction}
+            setTriggerAction={setTriggerAction}
+            language={language}
+          />
+          <Icons
+            triggerAction={triggerAction}
+            setTriggerAction={setTriggerAction}
+          />
         </div>
       </div>
     </>
