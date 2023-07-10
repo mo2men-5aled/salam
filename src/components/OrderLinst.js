@@ -4,7 +4,13 @@ import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { arrayMoveImmutable as arrayMove } from "array-move";
 
 import { useParams } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDocs,
+  updateDoc,
+  collection,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "../Firebase";
 import {
   Card,
@@ -40,7 +46,7 @@ const SortableItem = SortableElement(
               alignItems: "center",
             }}
           >
-            {item}
+            {item.type}
           </Col>
           <Col
             style={{
@@ -51,13 +57,15 @@ const SortableItem = SortableElement(
             }}
           >
             <a
-              href={Check_HTTP(item, return_Links(item, value))}
+              href={Check_HTTP(item.type, return_Links(item.type, value))}
               target="_blank"
               rel="noreferrer"
             >
-              <Button variant="outline-dark" size="sm">
-                {language === "ar" ? "عرض" : "Visit"}
-              </Button>
+              {item.type !== "Header Text" && item.type !== "Address" && (
+                <Button variant="outline-dark" size="sm">
+                  {language === "ar" ? "عرض" : "Visit"}
+                </Button>
+              )}
             </a>
           </Col>
         </Row>
@@ -66,7 +74,7 @@ const SortableItem = SortableElement(
         <Col xs={2} sm={2} md={1} lg={1}>
           <div className="p-2">
             <img
-              src={Icon_Codes[item]}
+              src={Icon_Codes[item.type]}
               alt="icon"
               className="rounded"
               style={{
@@ -94,7 +102,7 @@ const SortableItem = SortableElement(
                 textOverflow: "ellipsis",
               }}
             >
-              {Check_HTTP(item, return_Links(item, value))}
+              {Check_HTTP(item.type, value)}
             </Card.Text>
             <div style={{ alignSelf: "center" }}>
               <ButtonGroup size="sm">
@@ -128,7 +136,6 @@ const SortableItem = SortableElement(
 const SortableList = SortableContainer(
   ({
     num,
-    items,
     links,
     onDelete,
     onUpdate,
@@ -152,16 +159,16 @@ const SortableList = SortableContainer(
             padding: 0,
           }}
         >
-          {items.map((item, index) => {
-            if (links[item]) {
+          {links.map((link, index) => {
+            if (link) {
               num = num + 1;
               return (
                 <SortableItem
                   language={language}
-                  key={`item-${item}`}
+                  key={`item-${link.id}`}
                   index={index}
-                  value={links[item]}
-                  item={item}
+                  value={link.link}
+                  item={link}
                   handleShow={handleShow}
                   onDelete={onDelete}
                   onUpdate={onUpdate}
@@ -220,37 +227,54 @@ const MyComponent = ({
   const [selectedItem, setSelectedItem] = useState("");
 
   useEffect(() => {
+    const fetchLinkAndIcon = async () => {
+      // Construct the query to get documents in the nested collection with the user ID
+      const linkCollectionRef = collection(db, "link");
+      const nestedCollectionRef = collection(linkCollectionRef, id, "order");
+
+      // Execute the query
+      const querySnapshot = await getDocs(nestedCollectionRef);
+
+      // Get the data from the documents sorted
+      setLink(
+        querySnapshot.docs
+          .map((doc) => doc.data())
+          .sort((a, b) => a.number - b.number)
+      );
+    };
+
     if (!triggerAction) {
-      const ref = doc(db, "links", id);
-      getDoc(ref)
-        .then((link) => {
-          if (link.exists()) {
-            setLink(link.data());
-          }
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
+      fetchLinkAndIcon();
     }
-    if (setTriggerAction !== false) setTriggerAction(false);
+
+    if (triggerAction !== false) setTriggerAction(false);
   }, [id, triggerAction, setTriggerAction]);
 
   // Sortable function
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-    setIcons(arrayMove(icons, oldIndex, newIndex));
-    const ref = doc(db, "titles", id);
-    updateDoc(ref, {
-      list: arrayMove(icons, oldIndex, newIndex),
-    });
+  const onSortEnd = async ({ oldIndex, newIndex }) => {
+    const linkCollectionRef = collection(db, "link");
+    const nestedCollectionRef = collection(linkCollectionRef, id, "order");
+
+    // post the new list sort update
+    await Promise.all(
+      links.map(async (link, index) => {
+        const docRef = doc(nestedCollectionRef, link.id);
+        await updateDoc(docRef, {
+          number: index,
+        });
+      })
+    );
+    setLink(arrayMove(links, oldIndex, newIndex));
   };
 
   // Delete function
   const handleDelete = (e) => {
     e.preventDefault();
-    const ref = doc(db, "links", id);
-    updateDoc(ref, {
-      [selectedItem]: "",
-    }).then(
+    const linkCollectionRef = collection(db, "link");
+    const nestedCollectionRef = collection(linkCollectionRef, id, "order");
+    const docRef = doc(nestedCollectionRef, selectedItem.id);
+
+    deleteDoc(docRef).then(
       (num = num - 1),
       setFormField(""),
       handleDeleteModalClose(),
@@ -262,9 +286,12 @@ const MyComponent = ({
   // Update function
   const handleUpdate = (e) => {
     e.preventDefault();
-    const ref = doc(db, "links", id);
-    updateDoc(ref, {
-      [selectedItem]: FormField,
+
+    const linkCollectionRef = collection(db, "link");
+    const nestedCollectionRef = collection(linkCollectionRef, id, "order");
+    const docRef = doc(nestedCollectionRef, selectedItem.id);
+    updateDoc(docRef, {
+      link: FormField,
     }).then(
       setFormField(""),
       handleUpdateModalClose(),
@@ -273,7 +300,7 @@ const MyComponent = ({
     );
   };
 
-  if (!icons && !links) {
+  if (!links) {
     return (
       <div
         style={{
@@ -292,9 +319,9 @@ const MyComponent = ({
     <>
       <SortableList
         num={num}
-        items={icons}
         links={links}
         onSortEnd={onSortEnd}
+        pressDelay={200}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         UpdateModalshow={UpdateModalshow} //show
@@ -310,7 +337,7 @@ const MyComponent = ({
       <CustomModal
         show={UpdateModalshow}
         handleClose={handleUpdateModalClose}
-        header={`Update ${selectedItem}`}
+        header={`Update ${selectedItem.type}`}
         Button={
           <Button variant="outline-dark" onClick={handleUpdateModalShow}>
             {language === "ar" ? "تعديل" : "Update"}
@@ -353,8 +380,8 @@ const MyComponent = ({
               }}
             >
               {language === "ar"
-                ? `${links[selectedItem]} الرابط الحالي`
-                : `Current link : ${links[selectedItem]}`}
+                ? `${selectedItem.link} الرابط الحالي`
+                : `Current link : ${selectedItem.link}`}
             </Form.Text>
           </Form.Group>
         </Form>
@@ -363,7 +390,7 @@ const MyComponent = ({
       <CustomModal
         show={DeleteModalshow}
         handleClose={handleDeleteModalClose}
-        header={`Update ${selectedItem}`}
+        header={`Update ${selectedItem.type}`}
         FooterChildren={
           <Button variant="dark" onClick={handleDelete}>
             {language === "ar" ? "حذف" : "Delete"}
@@ -377,8 +404,8 @@ const MyComponent = ({
           }
         >
           {language === "ar"
-            ? `${selectedItem} هل انت متاكد من انك تريد حذف`
-            : `Are you sure you want to delete ${selectedItem}?`}
+            ? `${selectedItem.type} هل انت متاكد من انك تريد حذف`
+            : `Are you sure you want to delete ${selectedItem.type}?`}
         </Form.Text>
       </CustomModal>
     </>
