@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import MyComponent from "./OrderLinst";
+import OrderableList from "./OrderLinst";
+
 import AddLinks from "./AddLinks";
 
 function ControlledTabs({ triggerAction, setTriggerAction, language }) {
@@ -15,7 +16,7 @@ function ControlledTabs({ triggerAction, setTriggerAction, language }) {
       className="mb-3 justify-content-center"
     >
       <Tab eventKey="home" title={language === "ar" ? "الروابط" : "My Links"}>
-        <MyComponent
+        <OrderableList
           language={language}
           triggerAction={triggerAction}
           setTriggerAction={setTriggerAction}

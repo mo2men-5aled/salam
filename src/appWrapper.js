@@ -39,7 +39,6 @@ function AppWrapper() {
           path="/user/forgot-password"
           element={<ForgotPassword language={language} />}
         />
-
         {/* Routes with the navbar */}
         <Route
           path="/user/profile/:id"
@@ -73,6 +72,7 @@ function AppWrapper() {
             />
           }
         />
+        q
         <Route path="/articles" element={<ArticlesPage />} />
         <Route path="/article/:id" element={<ViewArticle />} />
         <Route path="/admin/:id" element={<AdminPage />} />

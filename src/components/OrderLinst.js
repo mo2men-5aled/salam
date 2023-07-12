@@ -198,7 +198,7 @@ const SortableList = SortableContainer(
   }
 );
 
-const MyComponent = ({
+const OrderableList = ({
   triggerAction,
   setTriggerAction,
   icons,
@@ -254,29 +254,44 @@ const MyComponent = ({
   const onSortEnd = async ({ oldIndex, newIndex }) => {
     const linkCollectionRef = collection(db, "link");
     const nestedCollectionRef = collection(linkCollectionRef, id, "order");
-
-    // post the new list sort update
-    await Promise.all(
-      links.map(async (link, index) => {
-        const docRef = doc(nestedCollectionRef, link.id);
-        await updateDoc(docRef, {
-          number: index,
-        });
-      })
-    );
-    setLink(arrayMove(links, oldIndex, newIndex));
+    let tempLinks;
+    try {
+      tempLinks = arrayMove(links, oldIndex, newIndex);
+      setLink(tempLinks);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await Promise.all(
+        tempLinks.map(async (link, index) => {
+          const docRef = doc(nestedCollectionRef, link.id);
+          await updateDoc(docRef, {
+            number: index,
+          });
+        })
+      );
+    }
   };
 
   // Delete function
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.preventDefault();
     const linkCollectionRef = collection(db, "link");
     const nestedCollectionRef = collection(linkCollectionRef, id, "order");
     const docRef = doc(nestedCollectionRef, selectedItem.id);
 
-    deleteDoc(docRef).then(
-      (num = num - 1),
-      setFormField(""),
+    // resort the items after delete
+    await Promise.all(
+      links
+        .filter((link) => link.id !== selectedItem.id)
+        .map(async (link, index) => {
+          const docRef = doc(nestedCollectionRef, link.id);
+          await updateDoc(docRef, {
+            number: index,
+          });
+        })
+    );
+
+    await deleteDoc(docRef).then(
       handleDeleteModalClose(),
       setSelectedItem(""),
       setTriggerAction(true)
@@ -321,7 +336,7 @@ const MyComponent = ({
         num={num}
         links={links}
         onSortEnd={onSortEnd}
-        pressDelay={200}
+        pressDelay={100}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         UpdateModalshow={UpdateModalshow} //show
@@ -412,4 +427,4 @@ const MyComponent = ({
   );
 };
 
-export default MyComponent;
+export default OrderableList;
