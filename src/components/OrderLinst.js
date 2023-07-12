@@ -1,16 +1,9 @@
-import { useEffect } from "react";
 import { useState } from "react";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { arrayMoveImmutable as arrayMove } from "array-move";
 
 import { useParams } from "react-router-dom";
-import {
-  doc,
-  getDocs,
-  updateDoc,
-  collection,
-  deleteDoc,
-} from "firebase/firestore";
+import { doc, updateDoc, collection, deleteDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 import {
   Card,
@@ -204,11 +197,11 @@ const OrderableList = ({
   icons,
   setIcons,
   language,
+  links,
+  setLink,
 }) => {
   var num = 0;
   const { id } = useParams();
-
-  const [links, setLink] = useState("");
 
   //Update Modal state
   const [UpdateModalshow, setUpdateModalShow] = useState(false);
@@ -225,30 +218,6 @@ const OrderableList = ({
 
   const [FormField, setFormField] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
-
-  useEffect(() => {
-    const fetchLinkAndIcon = async () => {
-      // Construct the query to get documents in the nested collection with the user ID
-      const linkCollectionRef = collection(db, "link");
-      const nestedCollectionRef = collection(linkCollectionRef, id, "order");
-
-      // Execute the query
-      const querySnapshot = await getDocs(nestedCollectionRef);
-
-      // Get the data from the documents sorted
-      setLink(
-        querySnapshot.docs
-          .map((doc) => doc.data())
-          .sort((a, b) => a.number - b.number)
-      );
-    };
-
-    if (!triggerAction) {
-      fetchLinkAndIcon();
-    }
-
-    if (triggerAction !== false) setTriggerAction(false);
-  }, [id, triggerAction, setTriggerAction]);
 
   // Sortable function
   const onSortEnd = async ({ oldIndex, newIndex }) => {

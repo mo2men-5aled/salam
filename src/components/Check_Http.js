@@ -7,7 +7,9 @@ function Check_HTTP(icon, link) {
       icon === "Number" ||
       icon === "Email" ||
       icon === "Address" ||
-      icon === "Header Text"
+      icon === "Header Text" ||
+      icon === "WhatsApp" ||
+      icon === "Telegram"
     ) {
       return link;
     } else {

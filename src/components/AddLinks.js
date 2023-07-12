@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { db } from "../Firebase";
-import { doc, addDoc, collection } from "firebase/firestore";
+import { doc, addDoc, collection, updateDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { Card, Row, Col, Button, Form } from "react-bootstrap";
 import Icon_Codes from "./Icon_Links";
 import CustomModal from "../modals/modal";
 
-const AddLinks = ({ setTriggerAction, language }) => {
+const AddLinks = ({ links, setTriggerAction, language }) => {
   const { id } = useParams();
 
   const [show, setShow] = useState(false);
@@ -21,16 +21,27 @@ const AddLinks = ({ setTriggerAction, language }) => {
 
     const linkRef = doc(db, "link", id);
     const orderCollectionRef = collection(linkRef, "order");
+    const position = links.length;
 
     addDoc(orderCollectionRef, {
       type: selectedItem,
-      value: FormField,
-      number: 0,
+      link: FormField,
+      number: position,
     })
-      .then(() => {
-        console.log("Document successfully updated!");
-        setTriggerAction(true);
-        handleClose();
+      .then((data) => {
+        const docRef = doc(orderCollectionRef, data.id);
+
+        try {
+          updateDoc(docRef, {
+            id: data.id,
+          });
+        } catch (error) {
+          console.error("Error updating document: ", error);
+        } finally {
+          setFormField("");
+          setTriggerAction(true);
+          handleClose();
+        }
       })
       .catch((error) => {
         console.error("Error updating document: ", error);
