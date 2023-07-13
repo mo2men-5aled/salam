@@ -2,8 +2,9 @@ import { useState } from "react";
 import { db } from "../Firebase";
 import { doc, addDoc, collection, updateDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
-import { Card, Row, Col, Button, Form } from "react-bootstrap";
+import { Card, Row, Col, Button, Form, Spinner } from "react-bootstrap";
 import Icon_Codes from "./Icon_Links";
+
 import CustomModal from "../modals/modal";
 
 const AddLinks = ({ links, setTriggerAction, language }) => {
@@ -12,6 +13,7 @@ const AddLinks = ({ links, setTriggerAction, language }) => {
   const [show, setShow] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
   const [FormField, setFormField] = useState("");
+  const [Loading, setLoading] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -22,6 +24,8 @@ const AddLinks = ({ links, setTriggerAction, language }) => {
     const linkRef = doc(db, "link", id);
     const orderCollectionRef = collection(linkRef, "order");
     const position = links.length;
+
+    setLoading(true);
 
     addDoc(orderCollectionRef, {
       type: selectedItem,
@@ -39,7 +43,9 @@ const AddLinks = ({ links, setTriggerAction, language }) => {
           console.error("Error updating document: ", error);
         } finally {
           setFormField("");
+          setLoading(false);
           setTriggerAction(true);
+
           handleClose();
         }
       })
@@ -115,9 +121,20 @@ const AddLinks = ({ links, setTriggerAction, language }) => {
           <Button
             variant="dark"
             onClick={handleAddLink}
-            disabled={FormField.length === 0 ? true : false}
+            disabled={FormField.length === 0 || Loading ? true : false}
             typr="submit"
           >
+            {Loading ? (
+              <Spinner
+                animation="border"
+                variant="light"
+                size="sm"
+                style={{
+                  marginRight: "0.5rem",
+                }}
+              />
+            ) : null}
+
             {language === "ar" ? "اضافة رابط..؟" : "Add Link ..?"}
           </Button>
         }
