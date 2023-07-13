@@ -125,7 +125,6 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
     }
   };
 
-  console.log(user.image);
   return (
     <div className="container dot">
       {/* Save Contacts button */}

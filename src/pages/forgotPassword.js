@@ -6,6 +6,7 @@ import { Alert, Card, Container, Row, Image } from "react-bootstrap";
 import logo from "../assets/dark.png";
 import { Link } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
+import MetaDeco from "../components/metaDeco";
 
 const ForgotPassword = ({ language }) => {
   const [email, setEmail] = useState("");
@@ -29,6 +30,7 @@ const ForgotPassword = ({ language }) => {
         backgroundColor: "#ededed",
       }}
     >
+      <MetaDeco />
       <Container>
         <Row
           style={{ minHeight: "100vh" }}

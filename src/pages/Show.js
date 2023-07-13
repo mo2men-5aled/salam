@@ -71,7 +71,7 @@ const Show = ({ language, triggerAction, setTriggerAction }) => {
   return (
     // Profile_Image
     <>
-      <MetaDeco bgcolor={Get_bg_Color(user.color)} language={language} />
+      <MetaDeco bgcolor={Get_bg_Color(user.color)} />
 
       <div>
         <BgImage User={user} />

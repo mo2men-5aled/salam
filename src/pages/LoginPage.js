@@ -15,6 +15,7 @@ import {
 } from "firebase/auth";
 
 import { useNavigate, Link } from "react-router-dom";
+import MetaDeco from "../components/metaDeco";
 
 function LoginPage({ language }) {
   const navigation = useNavigate();
@@ -97,6 +98,7 @@ function LoginPage({ language }) {
 
   return (
     <div style={{ backgroundColor: "#ededed" }}>
+      <MetaDeco />
       <Container>
         <Row
           style={{ minHeight: "100vh" }}

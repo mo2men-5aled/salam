@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../Firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { getAdditionalUserInfo } from "firebase/auth";
+import MetaDeco from "../components/metaDeco";
 
 const RegisterUser = ({ language }) => {
   const links = {
@@ -319,6 +320,7 @@ const RegisterUser = ({ language }) => {
 
   return (
     <div style={{ backgroundColor: "#ededed" }}>
+      <MetaDeco />
       <Container>
         <Row
           style={{ minHeight: "100vh" }}

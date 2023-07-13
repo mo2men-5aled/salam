@@ -1,0 +1,8 @@
+/* add local font  */
+@font-face {
+  font-family: "Tajawal";
+  src: local("Tajawal") url("../src/assets/fonts/Tajawal/Tajawal-Regular.ttf")
+    format("ttf");
+  font-weight: normal;
+  font-style: normal;
+}

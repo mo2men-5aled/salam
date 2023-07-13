@@ -9,6 +9,7 @@ import { Spinner } from "react-bootstrap";
 import { useEffect } from "react";
 import NotAuthorized from "../components/NotAuthorized";
 import ControlledTabs from "../components/Tabs";
+import MetaDeco from "../components/metaDeco";
 
 const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
   const { id } = useParams();
@@ -49,6 +50,7 @@ const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
         paddingBottom: "5rem",
       }}
     >
+      <MetaDeco />
       <UserProfileInfo
         language={language}
         triggerAction={triggerAction}

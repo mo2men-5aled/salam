@@ -1,9 +1,12 @@
 import React from "react";
 import { Image } from "react-bootstrap";
 import BlackLogo from "../assets/dark.png";
+import MetaDeco from "../components/metaDeco";
+
 function Home({ triggerAction, setTriggerAction, language }) {
   return (
     <div>
+      <MetaDeco />
       <div
         style={{
           display: "flex",
