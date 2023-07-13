@@ -86,10 +86,20 @@ const Icons = ({ triggerAction, setTriggerAction }) => {
 
   links.splice(index_of_HT, HeaderText.length);
 
-  const handleTap = async (icon) => {
+  const handleTap = async (item) => {
     const tapsRef = collection(doc(db, "users", id), "taps");
     const tapDocRef = doc(tapsRef);
-    await setDoc(tapDocRef, { type: icon, time: date }, { merge: true });
+    await setDoc(
+      tapDocRef,
+      {
+        time: date,
+        type: item.type,
+        link: item.link,
+        number: item.number,
+        id: item.id,
+      },
+      { merge: true }
+    );
   };
 
   return (
