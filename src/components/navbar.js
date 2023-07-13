@@ -16,8 +16,8 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
   const navigate = useNavigate();
   const user = useContext(AuthContext).currentUser;
   const [name, setName] = useState("");
-
   const [userID, setUserID] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEnglishLanguage = () => {
     if (user) {
@@ -52,14 +52,21 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
 
     if (!triggerAction) {
       if (user) {
-        getDoc(doc(db, "users", user.uid)).then((doc) => {
-          if (doc.exists()) {
-            const data = doc.data();
-            setName(data.name);
-            setLanguage(data.language);
-            setUserID(data.id);
-          }
-        });
+        setIsLoading(true);
+        getDoc(doc(db, "users", user.uid))
+          .then((docSnap) => {
+            if (docSnap.exists()) {
+              setUserID(user.uid);
+              setName(docSnap.data().name);
+              setLanguage(docSnap.data().language);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
       }
     }
 
@@ -76,78 +83,76 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
           </Navbar.Brand>
 
           <div className="d-flex justify-content-end align-items-center">
-            {language ? (
-              <Button
-                className="me-2"
-                style={{
-                  color: "white",
-                }}
-                variant="link"
-                onClick={() => {
-                  if (language === "en") {
-                    handleArabicLanguage();
-                  } else {
-                    handleEnglishLanguage();
-                  }
-                }}
-              >
-                {language}
-              </Button>
-            ) : null}
-            {user === undefined ? (
-              <Spinner animation="border" size="sm" variant="light" />
-            ) : (
-              <div>
-                {user === null ? (
-                  <>
-                    <Link
-                      as={Button}
-                      to="/user/register"
-                      className="me-2 btn btn-outline-light"
-                      variant="dark"
-                    >
-                      {language === "ar" ? "انشاء حساب" : "Register"}
-                    </Link>
-                    <Link
-                      as={Button}
-                      to="/user/login"
-                      className="me-2 btn btn-outline-light"
-                      variant="dark"
-                    >
-                      {language === "ar" ? "تسجيل الدخول" : "Login"}
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <Navbar.Text
-                        className="me-3"
-                        style={{
-                          color: "white",
-                          fontSize: "1 rem",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          navigate("/user/profile/" + user.uid);
-                        }}
-                      >
-                        {name}
-                      </Navbar.Text>
+            <Button
+              className="me-2"
+              style={{
+                color: "white",
+              }}
+              variant="link"
+              onClick={() => {
+                if (language === "en") {
+                  handleArabicLanguage();
+                } else {
+                  handleEnglishLanguage();
+                }
+              }}
+            >
+              {language}
+            </Button>
 
-                      <Button
-                        className="me-2"
-                        variant="outline-light"
-                        onClick={() => {
-                          auth.signOut();
-                        }}
-                      >
-                        {language === "ar" ? "تسجيل الخروج" : "Logout"}
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
+            {isLoading && (
+              <Spinner animation="border" size="sm" variant="light" />
             )}
+            <div>
+              {user === null ? (
+                <>
+                  <Link
+                    as={Button}
+                    to="/user/register"
+                    className="me-2 btn btn-outline-light"
+                    variant="dark"
+                  >
+                    {language === "ar" ? "انشاء حساب" : "Register"}
+                  </Link>
+                  <Link
+                    as={Button}
+                    to="/user/login"
+                    className="me-2 btn btn-outline-light"
+                    variant="dark"
+                  >
+                    {language === "ar" ? "تسجيل الدخول" : "Login"}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <Navbar.Text
+                      className="me-3"
+                      style={{
+                        color: "white",
+                        fontSize: "1 rem",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        navigate("/user/profile/" + user.uid);
+                      }}
+                    >
+                      {name}
+                    </Navbar.Text>
+
+                    <Button
+                      className="me-2"
+                      variant="outline-light"
+                      onClick={() => {
+                        auth.signOut();
+                      }}
+                    >
+                      {language === "ar" ? "تسجيل الخروج" : "Logout"}
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </Container>
       </Navbar>
