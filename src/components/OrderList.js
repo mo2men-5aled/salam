@@ -102,8 +102,8 @@ const SortableItem = SortableElement(
                 <Button
                   variant="outline-dark"
                   onClick={() => {
-                    handleUpdateModalShow();
                     setSelectedItem(item);
+                    handleUpdateModalShow();
                   }}
                 >
                   {language === "ar" ? "تعديل" : "Update"}
@@ -111,8 +111,8 @@ const SortableItem = SortableElement(
                 <Button
                   variant="outline-danger"
                   onClick={() => {
-                    handleDeleteModalShow();
                     setSelectedItem(item);
+                    handleDeleteModalShow();
                   }}
                 >
                   {language === "ar" ? "حذف" : "Delete"}
@@ -205,6 +205,7 @@ const OrderableList = ({
 
   //Update Modal state
   const [UpdateModalshow, setUpdateModalShow] = useState(false);
+
   //Delete Modal state
   const [DeleteModalshow, setDeleteModalShow] = useState(false);
 
@@ -218,6 +219,8 @@ const OrderableList = ({
 
   const [FormField, setFormField] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
+
+  const [Loading, setLoading] = useState(false);
 
   // Sortable function
   const onSortEnd = async ({ oldIndex, newIndex }) => {
@@ -248,6 +251,8 @@ const OrderableList = ({
     const nestedCollectionRef = collection(linkCollectionRef, id, "order");
     const docRef = doc(nestedCollectionRef, selectedItem.id);
 
+    setLoading(true);
+
     // resort the items after delete
     await Promise.all(
       links
@@ -261,9 +266,10 @@ const OrderableList = ({
     );
 
     await deleteDoc(docRef).then(
-      handleDeleteModalClose(),
       setSelectedItem(""),
-      setTriggerAction(true)
+      setTriggerAction(true),
+      setLoading(false),
+      handleDeleteModalClose()
     );
   };
 
@@ -274,13 +280,16 @@ const OrderableList = ({
     const linkCollectionRef = collection(db, "link");
     const nestedCollectionRef = collection(linkCollectionRef, id, "order");
     const docRef = doc(nestedCollectionRef, selectedItem.id);
+
+    setLoading(true);
     updateDoc(docRef, {
       link: FormField,
     }).then(
       setFormField(""),
-      handleUpdateModalClose(),
       setSelectedItem(""),
-      setTriggerAction(true)
+      setTriggerAction(true),
+      setLoading(false),
+      handleUpdateModalClose()
     );
   };
 
@@ -324,11 +333,28 @@ const OrderableList = ({
         header={`Update ${selectedItem.type}`}
         Button={
           <Button variant="outline-dark" onClick={handleUpdateModalShow}>
+            {Loading && (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                style={{ marginRight: "0.5rem" }}
+                variant="light"
+              />
+            )}
+
             {language === "ar" ? "تعديل" : "Update"}
           </Button>
         }
         FooterChildren={
-          <Button variant="dark" type="submit" onClick={handleUpdate}>
+          <Button
+            variant="dark"
+            type="submit"
+            onClick={handleUpdate}
+            disabled={!FormField ? true : false}
+          >
             {language === "ar" ? "تعديل" : "Update"}
           </Button>
         }
@@ -343,13 +369,14 @@ const OrderableList = ({
           >
             <Form.Label>{language === "ar" ? "الرابط" : "Link"}</Form.Label>
             <Form.Control
+              required
               style={
                 language === "ar"
                   ? { textAlign: "right" }
                   : { textAlign: "left" }
               }
               type="text"
-              placeholder={language === "ar" ? "ادخل الرابط" : "Enter link"}
+              placeholder={selectedItem.link}
               onChange={(e) => {
                 setFormField(e.target.value);
               }}
@@ -362,11 +389,7 @@ const OrderableList = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
-            >
-              {language === "ar"
-                ? `${selectedItem.link} الرابط الحالي`
-                : `Current link : ${selectedItem.link}`}
-            </Form.Text>
+            ></Form.Text>
           </Form.Group>
         </Form>
       </CustomModal>
@@ -377,6 +400,17 @@ const OrderableList = ({
         header={`Update ${selectedItem.type}`}
         FooterChildren={
           <Button variant="dark" onClick={handleDelete}>
+            {Loading && (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                style={{ marginRight: "0.5rem" }}
+                variant="light"
+              />
+            )}
             {language === "ar" ? "حذف" : "Delete"}
           </Button>
         }

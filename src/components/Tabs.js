@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import OrderableList from "./OrderLinst";
+import OrderableList from "./OrderList";
 import AddLinks from "./AddLinks";
 import { useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
