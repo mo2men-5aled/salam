@@ -26,94 +26,6 @@ import { getAdditionalUserInfo } from "firebase/auth";
 import MetaDeco from "../components/metaDeco";
 
 const RegisterUser = ({ language }) => {
-  const links = {
-    Address: "",
-    "App Link": "",
-    "Apple Music": "",
-    Call: "",
-    "Cash App": "",
-    Clubhouse: "",
-    "Contact Card": "",
-    "Custom link": "",
-    Discord: "",
-    Email: "",
-    "Embedded Video": "",
-    "Expandable Text": "",
-    FaceTime: "",
-    Facebook: "",
-    File: "",
-    "Header Text": "",
-    Instagram: "",
-    "Link Tree": "",
-    LinkedIn: "",
-    Number: "",
-    OnlyFans: "",
-    OpenSea: "",
-    PayPal: "",
-    Pinterest: "",
-    Podcasts: "",
-    Poshmark: "",
-    Reviews: "",
-    Snapchat: "",
-    SoundCloud: "",
-    Spotify: "",
-    Telegram: "",
-    TikTok: "",
-    Twitch: "",
-    Twitter: "",
-    Venmo: "",
-    WeChat: "",
-    Website: "",
-    WhatsApp: "",
-    YouTube: "",
-    Zelle: "",
-    Zillow: "",
-    hoobe: "",
-  };
-  const titles = [
-    "Number",
-    "Email",
-    "Instagram",
-    "Website",
-    "LinkedIn",
-    "Contact Card",
-    "WhatsApp",
-    "Call",
-    "WeChat",
-    "FaceTime",
-    "Address",
-    "Facebook",
-    "YouTube",
-    "TikTok",
-    "Twitter",
-    "Snapchat",
-    "Clubhouse",
-    "Twitch",
-    "Pinterest",
-    "App Link",
-    "Reviews",
-    "Embedded Video",
-    "Header Text",
-    "File",
-    "Expandable Text",
-    "Zillow",
-    "Cash App",
-    "Venmo",
-    "Zelle",
-    "PayPal",
-    "Custom link",
-    "Link Tree",
-    "Discord",
-    "Telegram",
-    "OnlyFans",
-    "OpenSea",
-    "Poshmark",
-    "Podcasts",
-    "hoobe",
-    "Spotify",
-    "Apple Music",
-    "SoundCloud",
-  ];
   const navigate = useNavigate();
 
   const { currentUser } = useContext(AuthContext);
@@ -164,15 +76,11 @@ const RegisterUser = ({ language }) => {
             scanQR: false,
             shareProfile: false,
             token: "",
-          });
-          // add links to links collection
-          const userLinksDoc = doc(db, "links", user.uid);
-          setDoc(userLinksDoc, links);
-
-          // add array of links names and arrange to the firebase titles collection
-          const userLinksTitlesDoc = doc(db, "titles", user.uid);
-          setDoc(userLinksTitlesDoc, {
-            list: titles,
+          }).then(async () => {
+            // add user id
+            await setDoc(doc(db, "link", user.uid), {
+              id: user.uid,
+            });
           });
         }
         navigate(`/user/profile/${user.uid}`);
@@ -190,7 +98,7 @@ const RegisterUser = ({ language }) => {
 
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
-      .then((result) => {
+      .then(async (result) => {
         // Signed in
         setIsLoading(false);
         //check if user have an account
@@ -224,19 +132,13 @@ const RegisterUser = ({ language }) => {
             scanQR: false,
             shareProfile: false,
             token: "",
-          });
-
-          // add links to links collection
-          const userLinksDoc = doc(db, "links", user.uid);
-          setDoc(userLinksDoc, links);
-
-          // add array of links names and arrange to the firebase titles collection
-          const userLinksTitlesDoc = doc(db, "titles", user.uid);
-          setDoc(userLinksTitlesDoc, {
-            list: titles,
+          }).then(async () => {
+            // add user id
+            await setDoc(doc(db, "link", user.uid), {
+              id: user.uid,
+            });
           });
         }
-
         navigate(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
@@ -262,7 +164,7 @@ const RegisterUser = ({ language }) => {
     } else {
       setIsLoading(false);
       createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
           // Signed in
           setIsLoading(false);
           const user = userCredential.user;
@@ -296,16 +198,11 @@ const RegisterUser = ({ language }) => {
               scanQR: false,
               shareProfile: false,
               token: "",
-            });
-
-            // add links to links collection
-            const userLinksDoc = doc(db, "links", user.uid);
-            setDoc(userLinksDoc, links);
-
-            // add array of links names and arrange to the firebase titles collection
-            const userLinksTitlesDoc = doc(db, "titles", user.uid);
-            setDoc(userLinksTitlesDoc, {
-              list: titles,
+            }).then(async () => {
+              // add user id
+              await setDoc(doc(db, "link", user.uid), {
+                id: user.uid,
+              });
             });
           }
           navigate(`/user/profile/${user.uid}`);

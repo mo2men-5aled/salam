@@ -70,6 +70,8 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
 
   const [user_id, setUser_id] = useState("empty");
 
+  console.log(user_id);
+
   const form_Values = {
     email: email,
     name: name,
@@ -186,6 +188,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 setEmail(e.target.value);
               }}
               required
+              autocomplete="false"
             />
 
             <Form.Control
@@ -211,6 +214,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 // }
               }}
               required
+              autocomplete="false"
             />
 
             <Form.Control
@@ -226,6 +230,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 }
               }}
               required
+              autocomplete="false"
             />
 
             <Form.Control
@@ -240,6 +245,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                   get_user_id_by_mail();
                 }
               }}
+              autocomplete="false"
             />
 
             <Form.Control
@@ -250,6 +256,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
               onChange={(e) => {
                 setCompany(e.target.value);
               }}
+              autocomplete="false"
             />
 
             <Form.Control
@@ -259,6 +266,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
               onChange={(e) => {
                 setNotes(e.target.value);
               }}
+              autocomplete="false"
             />
 
             <Button

@@ -23,6 +23,8 @@ const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
     });
   }, [userData]);
 
+  console.log(userData);
+
   if (!userData) {
     return (
       <div
@@ -36,10 +38,8 @@ const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
         <Spinner animation="border" variant="primary" />
       </div>
     );
-  } else {
-    if (userData.uid !== id) {
-      return <NotAuthorized />;
-    }
+  } else if (userData.uid !== id) {
+    return <NotAuthorized />;
   }
 
   return (
