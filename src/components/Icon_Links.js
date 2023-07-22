@@ -40,6 +40,7 @@ import youtube from "./mycollection/png/039-youtube.png"; //39
 import snapchat from "./mycollection/png/040-snapchat.png"; //40
 import hoobe from "./mycollection/png/041-hooli.png"; //41
 import zelle from "./mycollection/png/42-zelle.png"; //42
+import play_store from "./mycollection/png/43-play store.jpg";
 
 const Icon_Codes = {
   Instagram: instagram,
@@ -84,6 +85,7 @@ const Icon_Codes = {
   "Apple Music": applemusic,
   SoundCloud: soundcloud,
   "Embedded Video": e_vid,
+  "Google Play": play_store,
 };
 
 export default Icon_Codes;

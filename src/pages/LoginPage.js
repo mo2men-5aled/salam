@@ -6,19 +6,24 @@ import { Container, Row, Card, Image, Alert } from "react-bootstrap";
 
 import logo from "../assets/dark.png";
 import { auth } from "../Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+
 import { AuthContext } from "../context/userAuthContext";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   FacebookAuthProvider,
+  signInWithEmailAndPassword,
+  getAdditionalUserInfo,
 } from "firebase/auth";
+
+import { db } from "../Firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 import { useNavigate, Link } from "react-router-dom";
 import MetaDeco from "../components/metaDeco";
 
 function LoginPage({ language }) {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
 
   const { currentUser } = useContext(AuthContext);
 
@@ -48,7 +53,7 @@ function LoginPage({ language }) {
           // Signed in
           setIsLoading(false);
           const user = userCredential.user;
-          navigation(`/user/profile/${user.uid}`);
+          navigate(`/user/profile/${user.uid}`);
         })
         .catch((error) => {
           const errorMessage = error.message;
@@ -57,26 +62,6 @@ function LoginPage({ language }) {
         });
     }
   };
-
-  const handleLoginWithGoogle = () => {
-    setError("");
-    setIsLoading(true);
-
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // Signed in
-        setIsLoading(false);
-        const user = result.user;
-        navigation(`/user/profile/${user.uid}`);
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setIsLoading(false);
-        setError(errorMessage);
-      });
-  };
-
   const handleLoginWithFacebook = () => {
     setError("");
     setIsLoading(true);
@@ -86,8 +71,100 @@ function LoginPage({ language }) {
       .then((result) => {
         // Signed in
         setIsLoading(false);
+
         const user = result.user;
-        navigation(`/user/profile/${user.uid}`);
+
+        const { isNewUser } = getAdditionalUserInfo(result);
+
+        if (isNewUser) {
+          const userRef = doc(db, "users", user.uid);
+          setDoc(userRef, {
+            activeDevice: false,
+            addLink: true,
+            addProfileImage: false,
+            address: "",
+            backgroundImage: "",
+            bio: "",
+            captureLead: false,
+            color: "white",
+            company: "",
+            email: user.email,
+            id: user.uid,
+            image: user.photoURL,
+            imageQR: "",
+            jobTitle: "",
+            language: "ar",
+            logoImage: "",
+            name: user.displayName,
+            password: "",
+            pay: false,
+            scanQR: false,
+            shareProfile: false,
+            token: "",
+          }).then(async () => {
+            // add user id
+            await setDoc(doc(db, "link", user.uid), {
+              id: user.uid,
+            });
+          });
+        }
+        navigate(`/user/profile/${user.uid}`);
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        setIsLoading(false);
+        setError(errorMessage);
+      });
+  };
+
+  const handleLoginWithGoogle = () => {
+    setError("");
+    setIsLoading(true);
+
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(async (result) => {
+        // Signed in
+        setIsLoading(false);
+        //check if user have an account
+
+        const user = result.user;
+
+        const { isNewUser } = getAdditionalUserInfo(result);
+
+        if (isNewUser) {
+          const userRef = doc(db, "users", user.uid);
+          setDoc(userRef, {
+            activeDevice: false,
+            addLink: true,
+            addProfileImage: false,
+            address: "",
+            backgroundImage: "",
+            bio: "",
+            captureLead: false,
+            color: "white",
+            company: "",
+            email: user.email,
+            id: user.uid,
+            image: user.photoURL,
+            imageQR: "",
+            jobTitle: "",
+            language: "ar",
+            logoImage: "",
+            name: user.displayName,
+            password: "",
+            pay: false,
+            scanQR: false,
+            shareProfile: false,
+            token: "",
+          }).then(async () => {
+            // add user id
+            await setDoc(doc(db, "link", user.uid), {
+              id: user.uid,
+            });
+          });
+        }
+        navigate(`/user/profile/${user.uid}`);
       })
       .catch((error) => {
         const errorMessage = error.message;

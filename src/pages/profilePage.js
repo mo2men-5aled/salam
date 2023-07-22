@@ -23,8 +23,6 @@ const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
     });
   }, [userData]);
 
-  console.log(userData);
-
   if (!userData) {
     return (
       <div

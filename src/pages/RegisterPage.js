@@ -37,7 +37,7 @@ const RegisterUser = ({ language }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginWithFacebook = ({ language }) => {
+  const handleLoginWithFacebook = () => {
     setError("");
     setIsLoading(true);
 
