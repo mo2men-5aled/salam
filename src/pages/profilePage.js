@@ -10,8 +10,14 @@ import { useEffect } from "react";
 import NotAuthorized from "../components/NotAuthorized";
 import ControlledTabs from "../components/Tabs";
 import MetaDeco from "../components/metaDeco";
+import NavBar from "../components/navbar";
 
-const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
+const ProfilePage = ({
+  triggerAction,
+  setTriggerAction,
+  language,
+  setLanguage,
+}) => {
   const { id } = useParams();
   const [userData, setUserData] = useState(null);
 
@@ -41,31 +47,39 @@ const ProfilePage = ({ triggerAction, setTriggerAction, language }) => {
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: "#ededed",
-        minHeight: "100vh",
-        paddingBottom: "5rem",
-      }}
-    >
-      <MetaDeco />
-      <UserProfileInfo
-        language={language}
+    <>
+      <NavBar
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
+        language={language}
+        setLanguage={setLanguage}
       />
-      <Container>
-        <Card>
-          <Card.Body>
-            <ControlledTabs
-              language={language}
-              triggerAction={triggerAction}
-              setTriggerAction={setTriggerAction}
-            />
-          </Card.Body>
-        </Card>
-      </Container>
-    </div>
+      <div
+        style={{
+          backgroundColor: "#ededed",
+          minHeight: "100vh",
+          paddingBottom: "5rem",
+        }}
+      >
+        <MetaDeco />
+        <UserProfileInfo
+          language={language}
+          triggerAction={triggerAction}
+          setTriggerAction={setTriggerAction}
+        />
+        <Container>
+          <Card>
+            <Card.Body>
+              <ControlledTabs
+                language={language}
+                triggerAction={triggerAction}
+                setTriggerAction={setTriggerAction}
+              />
+            </Card.Body>
+          </Card>
+        </Container>
+      </div>
+    </>
   );
 };
 

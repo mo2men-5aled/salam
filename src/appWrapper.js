@@ -14,19 +14,11 @@ import AdminPage from "./pages/AdminPage";
 import PrivateRoute from "./privateRouts/privateRoute";
 import RegisterUser from "./pages/RegisterPage";
 
-import NavBar from "./components/navbar";
-
 function AppWrapper() {
   const [triggerAction, setTriggerAction] = useState(false);
   const [language, setLanguage] = useState("en");
   return (
     <BrowserRouter>
-      <NavBar
-        triggerAction={triggerAction}
-        setTriggerAction={setTriggerAction}
-        language={language}
-        setLanguage={setLanguage}
-      />
       <Routes>
         {/* Routes without navbar */}
         <Route path="/user/login" element={<LoginPage language={language} />} />
@@ -46,6 +38,7 @@ function AppWrapper() {
             <PrivateRoute>
               <ProfilePage
                 language={language}
+                setLanguage={setLanguage}
                 triggerAction={triggerAction}
                 setTriggerAction={setTriggerAction}
               />
@@ -57,6 +50,7 @@ function AppWrapper() {
           element={
             <Home
               language={language}
+              setLanguage={setLanguage}
               triggerAction={triggerAction}
               setTriggerAction={setTriggerAction}
             />
@@ -67,6 +61,7 @@ function AppWrapper() {
           element={
             <Show
               language={language}
+              setLanguage={setLanguage}
               triggerAction={triggerAction}
               setTriggerAction={setTriggerAction}
             />

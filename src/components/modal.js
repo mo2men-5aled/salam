@@ -69,9 +69,6 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
   const [emailFound, setEmailFound] = useState(false);
 
   const [user_id, setUser_id] = useState("empty");
-
-  console.log(user_id);
-
   const form_Values = {
     email: email,
     name: name,
@@ -188,7 +185,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 setEmail(e.target.value);
               }}
               required
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Form.Control

@@ -11,34 +11,35 @@ import { AuthContext } from "../context/userAuthContext";
 
 import { getDoc, doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
+  const { id } = useParams();
+
   const navigate = useNavigate();
   const user = useContext(AuthContext).currentUser;
   const [name, setName] = useState("");
 
-  const [userID, setUserID] = useState("");
+  // const [userID, setUserID] = useState("");
 
-  const handleEnglishLanguage = () => {
+  const handleEnglishLanguage = async () => {
     if (user) {
-      //update language variable in the database
-      updateDoc(doc(db, "users", userID), {
+      //set language state and then update the doc
+      setLanguage("en");
+      await updateDoc(doc(db, "users", user.uid), {
         language: "en",
-      }).then(() => {
-        setLanguage("en");
       });
     } else {
       setLanguage("en");
     }
     setTriggerAction(true);
   };
-  const handleArabicLanguage = () => {
+  const handleArabicLanguage = async () => {
     if (user) {
-      //update language variable in the database
-      updateDoc(doc(db, "users", userID), {
+      //set language state and then update the doc
+      setLanguage("ar");
+      await updateDoc(doc(db, "users", user.uid), {
         language: "ar",
-      }).then(() => {
-        setLanguage("ar");
       });
     } else {
       setLanguage("ar");
@@ -55,16 +56,27 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
         getDoc(doc(db, "users", user.uid)).then((doc) => {
           if (doc.exists()) {
             const data = doc.data();
+            console.log(data);
             setName(data.name);
             setLanguage(data.language);
-            setUserID(data.id);
+            // setUserID(data.id);
+          }
+        });
+      } else {
+        getDoc(doc(db, "users", id)).then((doc) => {
+          if (doc.exists()) {
+            const data = doc.data();
+            console.log(data);
+            setName(data.name);
+            setLanguage(data.language);
+            // setUserID(data.id);
           }
         });
       }
     }
 
     if (triggerAction !== false) setTriggerAction(false);
-  }, [user, triggerAction, setTriggerAction, setLanguage, setName, setUserID]);
+  }, [user, triggerAction, setTriggerAction, setLanguage, setName, id]);
 
   return (
     <>

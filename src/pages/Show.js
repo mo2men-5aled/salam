@@ -14,6 +14,8 @@ import PopUpForm from "../components/modal";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../Firebase";
 
+import NavBar from "../components/navbar";
+
 function Get_bg_Color(Color) {
   if (Color) {
     return property(
@@ -25,7 +27,7 @@ function Get_bg_Color(Color) {
   }
 }
 
-const Show = ({ language, triggerAction, setTriggerAction }) => {
+const Show = ({ language, triggerAction, setTriggerAction, setLanguage }) => {
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [redirect, setRedirect] = useState(false);
@@ -71,6 +73,12 @@ const Show = ({ language, triggerAction, setTriggerAction }) => {
   return (
     // Profile_Image
     <>
+      <NavBar
+        triggerAction={triggerAction}
+        setTriggerAction={setTriggerAction}
+        language={language}
+        setLanguage={setLanguage}
+      />
       <MetaDeco bgcolor={Get_bg_Color(user.color)} />
 
       <div>
