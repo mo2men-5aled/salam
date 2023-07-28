@@ -47,7 +47,7 @@ const Icon_Codes = {
   Email: gmail,
   LinkedIn: linkedin,
   Facebook: facebook,
-  Number: message,
+  Number: phone,
   Website: web,
   "Contact Card": pcard,
   WhatsApp: whatsapp,

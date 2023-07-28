@@ -211,7 +211,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 // }
               }}
               required
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Form.Control
@@ -227,7 +227,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                 }
               }}
               required
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Form.Control
@@ -242,7 +242,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
                   get_user_id_by_mail();
                 }
               }}
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Form.Control
@@ -253,7 +253,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
               onChange={(e) => {
                 setCompany(e.target.value);
               }}
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Form.Control
@@ -263,7 +263,7 @@ function PopUpForm({ user, language, triggerAction, setTriggerAction }) {
               onChange={(e) => {
                 setNotes(e.target.value);
               }}
-              autocomplete="false"
+              autoComplete="false"
             />
 
             <Button

@@ -18,15 +18,12 @@ const Create_Vcard = async (links, user) => {
   const first_name = n[0];
   const last_name = n[1];
 
-  myVCard
-    .addName(last_name, first_name)
-    .addCompany(user.company)
-    .addJobtitle(user.jobTitle);
+  myVCard.addName(name).addCompany(user.company).addJobtitle(user.jobTitle);
 
   links.forEach((link) => {
     if (link.type === "Email") {
       myVCard.addEmail(link.link);
-    } else if (link.type === "Call") {
+    } else if (link.type === "Call" || link.type === "Number") {
       myVCard.addPhoneNumber(link.link);
     } else if (link.type === "Address") {
       myVCard.addAddress(link.link);
@@ -40,7 +37,7 @@ const Create_Vcard = async (links, user) => {
     type: "text/x-vCard;charset=UTF-8",
   });
 
-  FileSaver.saveAs(blob, `${user.name}.vcf`);
+  FileSaver.saveAs(blob, `${name}.vcf`);
 };
 
 export default Create_Vcard;

@@ -4,7 +4,7 @@ function return_Links(icon, link) {
   } else if (icon === "Call" && link) {
     return `tel:${link}`;
   } else if (icon === "Number" && link) {
-    return `sms:${link}?body=`;
+    return `tel:${link}`;
   } else if (icon === "Email" && link) {
     return `mailto:${link}`;
   } else if (icon === "Telegram" && link) {

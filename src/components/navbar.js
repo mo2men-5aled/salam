@@ -20,8 +20,6 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
   const user = useContext(AuthContext).currentUser;
   const [name, setName] = useState("");
 
-  // const [userID, setUserID] = useState("");
-
   const handleEnglishLanguage = async () => {
     if (user) {
       //set language state and then update the doc
@@ -56,20 +54,18 @@ function NavBar({ triggerAction, setTriggerAction, language, setLanguage }) {
         getDoc(doc(db, "users", user.uid)).then((doc) => {
           if (doc.exists()) {
             const data = doc.data();
-            console.log(data);
             setName(data.name);
             setLanguage(data.language);
-            // setUserID(data.id);
           }
         });
-      } else {
+      }
+      if (!user && id) {
         getDoc(doc(db, "users", id)).then((doc) => {
           if (doc.exists()) {
             const data = doc.data();
-            console.log(data);
+
             setName(data.name);
             setLanguage(data.language);
-            // setUserID(data.id);
           }
         });
       }
