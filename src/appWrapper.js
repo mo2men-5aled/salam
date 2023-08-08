@@ -7,8 +7,6 @@ import Home from "./pages/home.js";
 import LoginPage from "./pages/LoginPage";
 import ForgotPassword from "./pages/forgotPassword";
 import ProfilePage from "./pages/profilePage";
-import ArticlesPage from "./pages/ArticlesPage";
-import ViewArticle from "./pages/ViewArticle";
 import AdminPage from "./pages/AdminPage";
 
 import PrivateRoute from "./privateRouts/privateRoute";
@@ -67,10 +65,6 @@ function AppWrapper() {
             />
           }
         />
-        q
-        <Route path="/articles" element={<ArticlesPage />} />
-        <Route path="/article/:id" element={<ViewArticle />} />
-        <Route path="/admin/:id" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );
